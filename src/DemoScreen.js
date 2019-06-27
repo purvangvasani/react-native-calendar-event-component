@@ -72,8 +72,8 @@ class DemoScreen extends Component {
         //On Click oC a event showing alert from here
         this.handleViewEvent(event);
     }
-    handleUpdateEvent = (value) => {
-        console.log(value);
+    handleUpdateEvent = () => {
+        
         
         this.setState({ viewModalVisible: !this.state.viewModalVisible, editModalVisible: true });
     };
@@ -88,6 +88,7 @@ class DemoScreen extends Component {
                     width={width}
                     //Container width
                     size={30}
+                    // virtualizedListProps
                     //number of date will render before and after initDate 
                     format24h={true}
                     //(default is 30 will render 30 day before initDate and 29 day after initDate)
