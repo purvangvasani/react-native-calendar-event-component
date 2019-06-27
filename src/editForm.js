@@ -13,73 +13,149 @@ class EditFormScreen extends Component {
         this.state = {
             id: this.props.data.id,
             title: this.props.data.title,
-            hour: this.props.data.hour,
-            heading: this.props.data.heading,
-            description: this.props.data.description,
+            start: '',
+            end: '',
+            summary: this.props.data.summary,
+            date: '',
+            isStartTimePickerVisible: false,
+            isEndTimePickerVisible: false,
+            isDatePickerVisible: false,
+            isModalVisible: true
         };
+        let date = this.props.data.start.substr(0,10)
+        let start = this.props.data.start.substr(12,8)
+        let end = this.props.data.end.substr(12,8)
+        this.state.date = date;
+        this.state.start = start;
+        this.state.end = end;
     };
-    
-    state={
-        title: '',
-        hour: '',
-        heading: '',
-        description: '',
-        isDateTimePickerVisible: false,
-        isModalVisible: true
-    }
 
-    showDateTimePicker = () => {
-        this.setState({ isDateTimePickerVisible: true });
+    showStartTimePicker = () => {
+        this.setState({ isStartTimePickerVisible: true });
     };
-     
-    hideDateTimePicker = () => {
-        this.setState({ isDateTimePickerVisible: false });
+    showEndTimePicker = () => {
+        this.setState({ isEndTimePickerVisible: true });
     };
-     
-    handleDatePicked = (date) => {
-        let time = date.toString()
-        time = time.substr(15,6)
+    showDatePicker = () => {
+        this.setState({ isDatePickerVisible: true });
+    };
+
+    handleStartTimePicked = (date) => {
+        let time1 = date.toString()
+        time1 = time1.substr(15,9);
+        console.log('====================================');
+        console.log(time1);
+        console.log('====================================');
         this.setState({
-            hour: time
+            start: time1,
         })
-        this.hideDateTimePicker();
+        this.hideStartTimePicker();
+    };
+    handleEndTimePicked = (date) => {
+        let time1 = date.toString()
+        time1 = time1.substr(15,9);
+        console.log('====================================');
+        console.log(time1);
+        console.log('====================================');
+        this.setState({
+            end: time1,
+        })
+        this.hideEndTimePicker();
+    };
+    handleDatePicked = (value) => {
+        let datetime = value.toString()
+        let day = datetime.substr(8,2)
+        let month = datetime.substr(4,3)
+        let year = datetime.substr(11,4)
+        this.convertMonth(month);
+        datetime = year+"-"+this.state.month+"-"+day
+        console.log('====================================');
+        console.log(datetime);
+        console.log('====================================');
+        this.setState({
+            date: datetime
+        })
+        this.hideDatePicker();
+    };
+
+    convertMonth=(month)=>{
+        
+        switch(month){
+            case 'Jan':
+                return this.setState({ month: '01' });
+            case 'Feb':
+                return this.setState({ month: '02' });
+            case 'Mar':
+                return this.setState({ month: '03' });
+            case 'Apr':
+                return this.setState({ month: '04' });
+            case 'May':
+                return this.setState({ month: '05' });
+            case 'Jun':
+                return this.setState({ month: '06' });
+            case 'Jul':
+                return this.setState({ month: '07' });
+            case 'Aug':
+                return this.setState({ month: '08' });
+            case 'Sep':
+                return this.setState({ month: '09' });
+            case 'Oct':
+                return this.setState({ month: '10' });
+            case 'Nov':
+                return this.setState({ month: '11' });
+            case 'Dec':
+                return this.setState({ month: '12' });
+        }
+    }
+     
+    hideStartTimePicker = () => {
+        this.setState({ isStartTimePickerVisible: false });
+    };
+    hideEndTimePicker = () => {
+        this.setState({ isEndTimePickerVisible: false });
+    };
+    hideDatePicker = () => {
+        this.setState({ isDatePickerVisible: false });
     };
 
     handleUpdateEvent(){
-        this.props.update(this.props.event.length, this.state.title, this.state.hour, this.state.heading, this.state.description)
+        this.state.start = this.state.date+ " " +this.state.start;
+        this.state.end = this.state.date+ " " +this.state.end;
+        console.log('====================================');
+        console.log(this.state.start);
+        console.log(this.state.end);
+        console.log('====================================');
+        this.props.update(this.state.id, this.state.start, this.state.end, this.state.title, this.state.summary)
         this.props.callback(this.props.visible);
     }
 
     handleEventDescriptionChange=(value)=>{
         this.setState({
-            description: value,
+            summary: value,
         })
     }
     handleEventHeadingChange=(value)=>{
         this.setState({
-            heading: value
+            title: value
         })
     }
 
     render() {
+        
         return (
             <Container>
                 <Content padder>
                         <View style={{flexDirection: 'row',}}>
-                            {/* <Icon name="chevron-left" size={40} style={{color: 'grey'}}/> */}
                             <Text style={{color: 'grey', fontSize: 17,left: 7, top: 4, fontWeight:'bold'}}>Event no. {this.state.id} Details</Text>
                         </View>
                     <Card>
                         <CardItem style={{borderBottomColor: 'grey', borderBottomWidth: 1}}>
                             <Grid>
-                                {/* <Col size={10}>
-                                    <Icon name="link" size={30} style={{color: '#E7516F', top: 3}} />
-                                </Col> */}
                                 <Col size={90}>
                                     <Input placeholder="Event Title" name="title"
                                         onChangeText={this.handleEventHeadingChange}
                                         ref={(input)=> this.getTitle = input}
-                                        value={this.state.heading}
+                                        value={this.state.title}
                                         style={{fontSize: 20, color:'#E7516F', fontWeight: 'bold',}} />
                                 </Col>
                             </Grid>
@@ -88,29 +164,57 @@ class EditFormScreen extends Component {
                             rowSpan={5} name="description" 
                             onChangeText={this.handleEventDescriptionChange}
                             style={{color:'#E7516F'}}
-                            value={this.state.description}
+                            value={this.state.summary}
                             placeholder="Event" style={{fontSize: 18}} />
                         <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
                             <Grid>
                                 <Col size={60}>
                                     <View style={{flexDirection: 'row'}}>
-                                        <Icon name="calendar" size={32} style={{color: '#FF9A00', top: 7}} />                                                
-                                        <Text style={{left: 2, fontWeight:'bold', textAlign: 'center', fontSize: 28, color:'#FF9A00'}}>{this.state.title}</Text>
+                                        <TouchableOpacity block onPress={this.showDatePicker}>
+                                            <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                
+                                        </TouchableOpacity>
+                                        <Text style={{left: 2, fontWeight:'bold', textAlign: 'center', fontSize: 28, color:'#FF9A00'}}>{this.state.date}</Text>
                                     </View>
                                 </Col>
-                                <Col size={35} style={{borderLeftWidth: 1, borderLeftColor: 'grey',}}>
+                            </Grid>
+                        </CardItem>
+                        <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
+                            <Grid>
+                                <Col size={60}>
                                     <View style={{flexDirection: 'row',}}>
-                                        <TouchableOpacity block onPress={this.showDateTimePicker}>
+                                        <TouchableOpacity block onPress={this.showStartTimePicker}>
                                             <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} />
                                         </TouchableOpacity>
-                                        <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.hour}</Text>
+                                        <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.start}</Text>
                                     </View>
                                 </Col>
                                 <DateTimePicker mode="time" is24Hour={false}
-                                    isVisible={this.state.isDateTimePickerVisible}
-                                    onConfirm={this.handleDatePicked}
-                                    onCancel={this.hideDateTimePicker}
+                                    isVisible={this.state.isStartTimePickerVisible}
+                                    onConfirm={this.handleStartTimePicked}
+                                    onCancel={this.hideStartTimePicker}
                                 />
+                                <DateTimePicker mode="time" is24Hour={false}
+                                    isVisible={this.state.isEndTimePickerVisible}
+                                    onConfirm={this.handleEndTimePicked}
+                                    onCancel={this.hideEndTimePicker}
+                                />
+                                <DateTimePicker mode="date" is24Hour={false}
+                                    isVisible={this.state.isDatePickerVisible}
+                                    onConfirm={this.handleDatePicked}
+                                    onCancel={this.hideDatePicker}
+                                />
+                            </Grid>
+                        </CardItem>
+                        <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
+                            <Grid>
+                                <Col size={60}>
+                                    <View style={{flexDirection: 'row',}}>
+                                        <TouchableOpacity block onPress={this.showEndTimePicker}>
+                                            <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} />
+                                        </TouchableOpacity>
+                                        <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.end}</Text>
+                                    </View>
+                                </Col>
                             </Grid>
                         </CardItem>
                         <Button block style={{marginTop: 10,}} onPress={() => this.handleUpdateEvent()} >
@@ -131,8 +235,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        update: (id, title, hour, heading, description) => {   
-            dispatch(updateEvent(id, title, hour, heading, description))
+        update: (id, start, end, title, summary) => {   
+            dispatch(updateEvent(id, start, end, title, summary))
         }
     }
 }
