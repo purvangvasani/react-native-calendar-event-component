@@ -4,19 +4,19 @@ import {connect} from 'react-redux'
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {addSubEvent, addEvent} from '../actions/events'
 import { TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/EvilIcons'
+import Icon from 'react-native-vector-icons/AntDesign'
+import { TextInput } from 'react-native-gesture-handler';
 
 class FormScreen extends Component {
     state={
-        start: '',
-        end: '',
         month: '00',
         title: '',
+        isErrorTitle: false,
         StartTime: '',
         EndTime: '',
+        isErrorEndTime: false,
         date: '',
-        heading: '',
-        description: '',
+        summary: '',
         isStartTimePickerVisible: false,
         isEndTimePickerVisible: false,
         isDatePickerVisible: false
@@ -53,12 +53,22 @@ class FormScreen extends Component {
     handleEndTimePicked = (date) => {
         let time1 = date.toString()
         time1 = time1.substr(15,9);
-        this.setState({
-            EndTime: time1,
-        })
+        
+        let err = parseInt(time1) - parseInt(this.state.StartTime)
+        if(err < 0){
+            this.setState({
+                isErrorEndTime: true,
+                EndTime: 'Time Must be greater than Start Time',
+            })
+        }
+        else{
+            this.setState({
+                isErrorEndTime: false,
+                EndTime: time1,
+            })
+        }
         this.hideEndTimePicker();
     };
-    
     handleDatePicked = (value) => {
         let datetime = value.toString()
         let day = datetime.substr(8,2)
@@ -103,48 +113,39 @@ class FormScreen extends Component {
     }
 
     handleSaveEvent(){
-        this.state.start = this.state.date+ "" +this.state.StartTime;
-        this.state.end = this.state.date+ "" +this.state.EndTime;
-        console.log('====================================');
-        console.log(this.state.start);
-        console.log(this.state.end);
-        console.log('====================================');
-        this.props.add(this.props.event.length, this.state.start, this.state.end, this.state.heading, this.state.description)
+        this.state.StartTime = this.state.date+ "" +this.state.StartTime;
+        this.state.EndTime = this.state.date+ "" +this.state.EndTime;
+        if(this.state.title.length > 0){
+            if(!this.state.isErrorEndTime){
+                this.props.add(this.props.event.length, this.state.StartTime, this.state.EndTime, this.state.title, this.state.summary)
+                this.props.callback(this.props.num);
+            }
+        }
+        else{
+            alert('Fields are empty!')
+        }
         
-        // let flag = 0;
-        // if(this.props.event.length <=0){
-        //     this.props.add(this.props.event.length, this.props.date, this.state.hour, this.state.heading, this.state.description)
-        // }else{
-        //     for(let i=0; i< this.props.event.length; i++){
-        //         if(this.props.date === this.props.event[i].title)
-        //         {
-        //             flag = 1
-        //             // this.props.addSub(this.props.event[i].data.length, this.props.date, this.state.hour, this.state.heading, this.state.description)
-        //         }
-        //         // else{
-        //         //     this.props.add(this.props.event.length, this.props.date, this.state.hour, this.state.heading, this.state.description)
-        //         // }
-        //     }
-        // }
-        // if(flag == 1){
-        //     this.props.addSub(this.props.event.length, this.props.date, this.state.hour, this.state.heading, this.state.description)
-        // }
-        // else{
-        //     this.props.add(this.props.event.length, this.props.date, this.state.hour, this.state.heading, this.state.description)
-        // }
-        this.props.callback(this.props.num);
     }
     
-    handleEventDescriptionChange=(value)=>{
+   
+    handleEventSummaryChange=(value)=>{
         this.setState({
-            description: value,
+            summary: value,
         })
     }
-    handleEventHeadingChange=(value)=>{
-        this.setState({
-            heading: value
-        })
+    handleEventTitleChange=(value)=>{
+        if(value.length == 0 ){
+            this.setState({
+                isErrorTitle: true,
+            })
+        }
+        else{
+            this.setState({
+                title: value
+            })
+        }
     }
+    
     render() {
         return (
             <Container>
@@ -160,16 +161,19 @@ class FormScreen extends Component {
                                     <Icon name="link" size={30} style={{color: '#E7516F', top: 3}} />
                                 </Col> */}
                                 <Col size={90}>
-                                    <Input placeholder="Event Title" name="title"
-                                        onChangeText={this.handleEventHeadingChange}
+                                    <TextInput placeholder="Event Title" name="title"
+                                        onChangeText={this.handleEventTitleChange}
                                         ref={(input)=> this.getTitle = input}
                                         style={{fontSize: 20, color:'#E7516F', fontWeight: 'bold',}} />
                                 </Col>
+                                <Col size={10}>
+                                    {this.state.isErrorTitle ? <Icon name="frown" size={26} style={{color:'red', top: 10}} /> : null }
+                                </Col>
                             </Grid>
                         </CardItem>
-                        <Textarea ref={(input)=>this.getDescription = input}
-                            rowSpan={5} name="description" 
-                            onChangeText={this.handleEventDescriptionChange}
+                        <Textarea ref={(input)=>this.getSummary = input}
+                            rowSpan={5} name="summary" 
+                            onChangeText={this.handleEventSummaryChange}
                             style={{color:'#E7516F'}}
                             placeholder="Event" style={{fontSize: 18}} />
                         <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
@@ -177,7 +181,7 @@ class FormScreen extends Component {
                                 <Col size={85}>
                                     <View style={{flexDirection: 'row', left: 0}}>
                                         <TouchableOpacity block onPress={this.showDatePicker}>
-                                            <Icon name="calendar" size={32} style={{color: 'blue', top: 8}} />                                                
+                                            <Icon name="calendar" size={28} style={{color: 'blue', top: 8}} />                                                
                                         </TouchableOpacity>
                                         <Text style={{left: 0, fontWeight:'bold', textAlign: 'center', fontSize: 28, color:'#FF9A00'}}>{this.state.date}</Text>
                                     </View>
@@ -189,9 +193,9 @@ class FormScreen extends Component {
                                 <Col size={85}>
                                     <View style={{flexDirection: 'row',}}>
                                         <TouchableOpacity block onPress={this.showStartTimePicker}>
-                                            <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 8}} />
+                                            <Icon name="clockcircleo" size={25} style={{left: 0, color: 'blue', top: 8}} />
                                         </TouchableOpacity>
-                                        <Text style={{fontWeight:'bold', left: 2, fontSize: 28, color:'#FF9A00'}}>Start: {this.state.StartTime}</Text>
+                                        <Text style={{fontWeight:'bold', left: 5, fontSize: 28, color:'#FF9A00'}}>Start: {this.state.StartTime}</Text>
                                     </View>
                                 </Col>
                                 <DateTimePicker mode="time" is24Hour={false}
@@ -216,9 +220,12 @@ class FormScreen extends Component {
                                 <Col size={85}>
                                     <View style={{flexDirection: 'row',}}>
                                         <TouchableOpacity block onPress={this.showEndTimePicker}>
-                                            <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 8}} />
+                                            <Icon name="clockcircleo" size={25} style={{left: 0, color: 'blue', top: 8}} />
                                         </TouchableOpacity>
-                                        <Text style={{fontWeight:'bold', left: 2, fontSize: 28, color:'#FF9A00'}}>End: {this.state.EndTime}</Text>
+                                        {this.state.isErrorEndTime
+                                            ? <Text style={{fontWeight:'bold', left: 5, fontSize: 20, color:'red'}}>End: {this.state.EndTime}</Text>
+                                            : <Text style={{fontWeight:'bold', left: 5, fontSize: 28, color:'#FF9A00'}}>End: {this.state.EndTime}</Text>
+                                        }
                                     </View>
                                 </Col>
                             </Grid>
@@ -241,9 +248,6 @@ const mapStateToProps = state => {
   
 const mapDispatchToProps = dispatch => {
     return {
-        addSub: (id, title, hour, heading, description) => {   
-            dispatch(addSubEvent(id, title, hour, heading, description))
-        },
         add: (id, startTime, endTime, title, summary) => {   
             dispatch(addEvent(id, startTime, endTime, title, summary))
         }

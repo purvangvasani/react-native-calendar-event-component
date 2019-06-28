@@ -17,14 +17,15 @@ class EditFormScreen extends Component {
             end: '',
             summary: this.props.data.summary,
             date: '',
+            isErrorEndTime: false,
             isStartTimePickerVisible: false,
             isEndTimePickerVisible: false,
             isDatePickerVisible: false,
             isModalVisible: true
         };
         let date = this.props.data.start.substr(0,10)
-        let start = this.props.data.start.substr(12,8)
-        let end = this.props.data.end.substr(12,8)
+        let start = this.props.data.start.substr(11,8)
+        let end = this.props.data.end.substr(11,8)
         this.state.date = date;
         this.state.start = start;
         this.state.end = end;
@@ -43,9 +44,6 @@ class EditFormScreen extends Component {
     handleStartTimePicked = (date) => {
         let time1 = date.toString()
         time1 = time1.substr(15,9);
-        console.log('====================================');
-        console.log(time1);
-        console.log('====================================');
         this.setState({
             start: time1,
         })
@@ -53,13 +51,21 @@ class EditFormScreen extends Component {
     };
     handleEndTimePicked = (date) => {
         let time1 = date.toString()
-        time1 = time1.substr(15,9);
-        console.log('====================================');
-        console.log(time1);
-        console.log('====================================');
-        this.setState({
-            end: time1,
-        })
+        time1 = time1.substr(15,10);
+        let err = parseInt(time1) - parseInt(this.state.start)
+        if(err < 0){
+            this.setState({
+                isErrorEndTime: true,
+                end: 'Time Must be greater than Start Time',
+            })
+        }
+        else{
+            this.setState({
+                isErrorEndTime: false,
+                end: time1,
+            })
+        }
+        
         this.hideEndTimePicker();
     };
     handleDatePicked = (value) => {
@@ -69,9 +75,6 @@ class EditFormScreen extends Component {
         let year = datetime.substr(11,4)
         this.convertMonth(month);
         datetime = year+"-"+this.state.month+"-"+day
-        console.log('====================================');
-        console.log(datetime);
-        console.log('====================================');
         this.setState({
             date: datetime
         })
@@ -119,12 +122,8 @@ class EditFormScreen extends Component {
     };
 
     handleUpdateEvent(){
-        this.state.start = this.state.date+ " " +this.state.start;
-        this.state.end = this.state.date+ " " +this.state.end;
-        console.log('====================================');
-        console.log(this.state.start);
-        console.log(this.state.end);
-        console.log('====================================');
+        this.state.start = this.state.date+ "" +this.state.start;
+        this.state.end = this.state.date+ "" +this.state.end;
         this.props.update(this.state.id, this.state.start, this.state.end, this.state.title, this.state.summary)
         this.props.callback(this.props.visible);
     }
@@ -191,18 +190,15 @@ class EditFormScreen extends Component {
                                 <DateTimePicker mode="time" is24Hour={false}
                                     isVisible={this.state.isStartTimePickerVisible}
                                     onConfirm={this.handleStartTimePicked}
-                                    onCancel={this.hideStartTimePicker}
-                                />
+                                    onCancel={this.hideStartTimePicker} />
                                 <DateTimePicker mode="time" is24Hour={false}
                                     isVisible={this.state.isEndTimePickerVisible}
                                     onConfirm={this.handleEndTimePicked}
-                                    onCancel={this.hideEndTimePicker}
-                                />
+                                    onCancel={this.hideEndTimePicker} />
                                 <DateTimePicker mode="date" is24Hour={false}
                                     isVisible={this.state.isDatePickerVisible}
                                     onConfirm={this.handleDatePicked}
-                                    onCancel={this.hideDatePicker}
-                                />
+                                    onCancel={this.hideDatePicker} />
                             </Grid>
                         </CardItem>
                         <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
@@ -212,7 +208,11 @@ class EditFormScreen extends Component {
                                         <TouchableOpacity block onPress={this.showEndTimePicker}>
                                             <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} />
                                         </TouchableOpacity>
-                                        <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.end}</Text>
+                                        {this.state.isErrorEndTime
+                                            ? <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 22, color:'red'}}>{this.state.end}</Text>
+                                            : <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.end}</Text>
+                                        }
+                                        {/* <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.end}</Text> */}
                                     </View>
                                 </Col>
                             </Grid>

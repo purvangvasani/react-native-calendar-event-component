@@ -4,13 +4,12 @@ import EventCalendar from 'react-native-events-calendar'
 import { Container, Text, Content, Fab, Card, CardItem, Grid, Col } from 'native-base';
 import Modal from "react-native-modal";
 import { deleteEvent } from "../actions/events";
-
-let { width } = Dimensions.get('window')
-
 import FormScreen from "./Form";
 import EditFormScreen from "./editForm";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { connect } from 'react-redux';
+
+let { width } = Dimensions.get('window')
 
 class DemoScreen extends Component {
     constructor(props) {
@@ -28,6 +27,7 @@ class DemoScreen extends Component {
             result: "",
         };
     }
+
     getAddModalResponse(isModalVisible) {
         this.setState({
             isModalVisible
@@ -38,6 +38,7 @@ class DemoScreen extends Component {
             editModalVisible
         });
     }
+
     toggleModal = () => {
         this.setState({
             isModalVisible: !this.state.isModalVisible
@@ -53,6 +54,7 @@ class DemoScreen extends Component {
             editModalVisible: !this.state.editModalVisible
         });
     };
+
     handleDeleteEvent = (value) => {
         this.props.delete(value);
         this.setState({
@@ -62,21 +64,21 @@ class DemoScreen extends Component {
     handleViewEvent = (value) => {
         this.setState({ viewModalVisible: true, result: value});
         let date = value.start.substr(0,10)
-        let start = value.start.substr(12,8)
-        let end = value.end.substr(12,8)
+        let start = value.start.substr(11,8)
+        let end = value.end.substr(11,8)
 
         this.state.start = start
         this.state.end = end
     };
+    handleUpdateEvent = (value) => {
+        this.setState({ viewModalVisible: !this.state.viewModalVisible, editModalVisible: true });
+    };
+   
     eventClicked(event) {
         //On Click oC a event showing alert from here
         this.handleViewEvent(event);
     }
-    handleUpdateEvent = () => {
-        
-        
-        this.setState({ viewModalVisible: !this.state.viewModalVisible, editModalVisible: true });
-    };
+    
     render() {
         return (
             <View style={{ flex: 1, marginTop: 20 }}>
@@ -235,8 +237,7 @@ class DemoScreen extends Component {
                     animationInTiming={600}
                     animationOutTiming={600}
                     backdropTransitionInTiming={600}
-                    backdropTransitionOutTiming={600}
-                >
+                    backdropTransitionOutTiming={600} >
                     <View style={{ flex: 1 }}>
                         <TouchableOpacity onPress={this.editToggleModal}>
                             <Icon name="chevron-left" size={24} style={{ color: "white" }} />
@@ -258,15 +259,6 @@ class DemoScreen extends Component {
                         this.setState({ isModalVisible: true });
                       }}>
                     <Icon name="plus" />
-                    {/* <Button style={{ backgroundColor: '#34A34F' }}>
-                      <Icon name="logo-whatsapp" />
-                    </Button>
-                    <Button style={{ backgroundColor: '#3B5998' }}>
-                      <Icon name="logo-facebook" />
-                    </Button>
-                    <Button disabled style={{ backgroundColor: '#DD5144' }}>
-                      <Icon name="mail" />
-                    </Button> */}
                 </Fab>
             </View>
         );
@@ -274,9 +266,6 @@ class DemoScreen extends Component {
 }
 
 const mapStateToProps = state => {
-    console.log('====================================');
-    console.log(state.event.events);
-    console.log('====================================');
     return {
         event: state.event.events
     }
@@ -289,6 +278,5 @@ const mapDispatchToProps = dispatch => {
         }
     };
 };
-  
 
 export default connect(mapStateToProps, mapDispatchToProps)(DemoScreen);
