@@ -2,20 +2,25 @@ import React, { Component } from 'react';
 import { Container, Content, Form, Item, Label, Input, Button, Text, Textarea, Grid, Row, Col, Card, CardItem } from 'native-base';
 import {connect} from 'react-redux'
 import DateTimePicker from "react-native-modal-datetime-picker";
-import {addSubEvent, addEvent} from '../actions/events'
+import {addEvent} from '../actions/events'
 import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign'
 import { TextInput } from 'react-native-gesture-handler';
+
+var today = new Date();
+var hour = today.getHours() + 1
+var start = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+var end = hour + ":" + today.getMinutes() + ":" + today.getSeconds();
 
 class FormScreen extends Component {
     state={
         month: '00',
         title: '',
         isErrorTitle: false,
-        StartTime: '',
-        EndTime: '',
+        StartTime: start,
+        EndTime: end,
         isErrorEndTime: false,
-        date: '',
+        date: this.props.date,
         summary: '',
         isStartTimePickerVisible: false,
         isEndTimePickerVisible: false,
@@ -43,37 +48,36 @@ class FormScreen extends Component {
     };
      
     handleStartTimePicked = (date) => {
-        let time1 = date.toString()
-        time1 = time1.substr(15,9);
+        let startTime = date.toString()
+        startTime = startTime.substr(15,9).trim();
         this.setState({
-            StartTime: time1,
+            StartTime: startTime,
         })
         this.hideStartTimePicker();
     };
     handleEndTimePicked = (date) => {
-        let time1 = date.toString()
-        time1 = time1.substr(15,9);
-        
-        let err = parseInt(time1) - parseInt(this.state.StartTime)
+        let endTime = date.toString()
+        endTime = endTime.substr(15,9).trim();
+        let err = parseInt(endTime) - parseInt(this.state.StartTime)
         if(err < 0){
             this.setState({
                 isErrorEndTime: true,
-                EndTime: 'Time Must be greater than Start Time',
+                EndTime: endTime,
             })
         }
-        else{
+        else if(err> 0){
             this.setState({
                 isErrorEndTime: false,
-                EndTime: time1,
+                EndTime: endTime,
             })
         }
         this.hideEndTimePicker();
     };
     handleDatePicked = (value) => {
         let datetime = value.toString()
-        let day = datetime.substr(8,2)
-        let month = datetime.substr(4,3)
-        let year = datetime.substr(11,4)
+        let day = datetime.substr(8,2).trim()
+        let month = datetime.substr(4,3).trim()
+        let year = datetime.substr(11,4).trim()
         this.convertMonth(month);
         datetime = year+"-"+this.state.month+"-"+day
         this.setState({
@@ -113,8 +117,8 @@ class FormScreen extends Component {
     }
 
     handleSaveEvent(){
-        this.state.StartTime = this.state.date+ "" +this.state.StartTime;
-        this.state.EndTime = this.state.date+ "" +this.state.EndTime;
+        this.state.StartTime = this.state.date+ " " +this.state.StartTime;
+        this.state.EndTime = this.state.date+ " " +this.state.EndTime;
         if(this.state.title.length > 0){
             if(!this.state.isErrorEndTime){
                 this.props.add(this.props.event.length, this.state.StartTime, this.state.EndTime, this.state.title, this.state.summary)
@@ -124,7 +128,6 @@ class FormScreen extends Component {
         else{
             alert('Fields are empty!')
         }
-        
     }
     
    
@@ -150,16 +153,9 @@ class FormScreen extends Component {
         return (
             <Container>
                 <Content padder>
-                        {/* <View style={{flexDirection: 'row',}}>
-                            {/* <Icon name="chevron-left" size={40} style={{color: 'grey'}}/> 
-                            <Text style={{color: 'grey', fontSize: 17,left: 7, top: 4, fontWeight:'bold'}}>Event no. {this.state.id} Details</Text>
-                        </View> */}
                     <Card>
                         <CardItem style={{borderBottomColor: 'grey', borderBottomWidth: 1}}>
                             <Grid>
-                                {/* <Col size={10}>
-                                    <Icon name="link" size={30} style={{color: '#E7516F', top: 3}} />
-                                </Col> */}
                                 <Col size={90}>
                                     <TextInput placeholder="Event Title" name="title"
                                         onChangeText={this.handleEventTitleChange}
@@ -178,25 +174,31 @@ class FormScreen extends Component {
                             placeholder="Event" style={{fontSize: 18}} />
                         <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
                             <Grid>
-                                <Col size={85}>
-                                    <View style={{flexDirection: 'row', left: 0}}>
+                                <Col size={55} style={{borderRightColor: 'grey', borderRightWidth: 1,}}>
+                                    <View style={{flex: 1,alignItems: 'flex-start', justifyContent: 'center'}}>
                                         <TouchableOpacity block onPress={this.showDatePicker}>
-                                            <Icon name="calendar" size={28} style={{color: 'blue', top: 8}} />                                                
+                                            <Text style={{fontSize: 28, color:'#686767'}}>{this.state.date}</Text>
                                         </TouchableOpacity>
-                                        <Text style={{left: 0, fontWeight:'bold', textAlign: 'center', fontSize: 28, color:'#FF9A00'}}>{this.state.date}</Text>
                                     </View>
                                 </Col>
-                            </Grid>
-                        </CardItem>
-                        <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
-                            <Grid>
-                                <Col size={85}>
-                                    <View style={{flexDirection: 'row',}}>
-                                        <TouchableOpacity block onPress={this.showStartTimePicker}>
-                                            <Icon name="clockcircleo" size={25} style={{left: 0, color: 'blue', top: 8}} />
-                                        </TouchableOpacity>
-                                        <Text style={{fontWeight:'bold', left: 5, fontSize: 28, color:'#FF9A00'}}>Start: {this.state.StartTime}</Text>
-                                    </View>
+                                <Col size={45}>
+                                    <Row size={50}>
+                                        <View style={{flex: 1, alignItems: 'center',}}>
+                                            <TouchableOpacity block onPress={this.showStartTimePicker}>
+                                                <Text style={{fontSize: 28, color:'#686767'}}>{this.state.StartTime}</Text> 
+                                            </TouchableOpacity>
+                                        </View>
+                                    </Row>
+                                    <Row size={50}>
+                                        <View style={{flex: 1, alignItems: 'center',}}>
+                                            <TouchableOpacity block onPress={this.showEndTimePicker}>
+                                                {this.state.isErrorEndTime
+                                                ? <Text style={{fontSize: 24, color:'red',fontWeight: 'bold'}}>{this.state.EndTime}</Text>
+                                                : <Text style={{fontSize: 28, color:'#686767'}}>{this.state.EndTime}</Text>
+                                                }
+                                            </TouchableOpacity>
+                                        </View>
+                                    </Row>
                                 </Col>
                                 <DateTimePicker mode="time" is24Hour={false}
                                     isVisible={this.state.isStartTimePickerVisible}
@@ -213,21 +215,6 @@ class FormScreen extends Component {
                                     onConfirm={this.handleDatePicked}
                                     onCancel={this.hideDatePicker}
                                 />
-                            </Grid>
-                        </CardItem>
-                        <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
-                            <Grid>
-                                <Col size={85}>
-                                    <View style={{flexDirection: 'row',}}>
-                                        <TouchableOpacity block onPress={this.showEndTimePicker}>
-                                            <Icon name="clockcircleo" size={25} style={{left: 0, color: 'blue', top: 8}} />
-                                        </TouchableOpacity>
-                                        {this.state.isErrorEndTime
-                                            ? <Text style={{fontWeight:'bold', left: 5, fontSize: 20, color:'red'}}>End: {this.state.EndTime}</Text>
-                                            : <Text style={{fontWeight:'bold', left: 5, fontSize: 28, color:'#FF9A00'}}>End: {this.state.EndTime}</Text>
-                                        }
-                                    </View>
-                                </Col>
                             </Grid>
                         </CardItem>
                         <Button block style={{marginTop: 10,}} onPress={() => this.handleSaveEvent()} >

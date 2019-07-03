@@ -23,9 +23,9 @@ class EditFormScreen extends Component {
             isDatePickerVisible: false,
             isModalVisible: true
         };
-        let date = this.props.data.start.substr(0,10)
-        let start = this.props.data.start.substr(11,8)
-        let end = this.props.data.end.substr(11,8)
+        let date = this.props.data.start.substr(0,10).trim()
+        let start = this.props.data.start.substr(11,8).trim()
+        let end = this.props.data.end.substr(11,8).trim()
         this.state.date = date;
         this.state.start = start;
         this.state.end = end;
@@ -44,6 +44,7 @@ class EditFormScreen extends Component {
     handleStartTimePicked = (date) => {
         let time1 = date.toString()
         time1 = time1.substr(15,9);
+        time1 = time1.trim()
         this.setState({
             start: time1,
         })
@@ -52,11 +53,12 @@ class EditFormScreen extends Component {
     handleEndTimePicked = (date) => {
         let time1 = date.toString()
         time1 = time1.substr(15,10);
+        time1 = time1.trim()
         let err = parseInt(time1) - parseInt(this.state.start)
         if(err < 0){
             this.setState({
                 isErrorEndTime: true,
-                end: 'Time Must be greater than Start Time',
+                end: 'Invalid Time',
             })
         }
         else{
@@ -122,8 +124,8 @@ class EditFormScreen extends Component {
     };
 
     handleUpdateEvent(){
-        this.state.start = this.state.date+ "" +this.state.start;
-        this.state.end = this.state.date+ "" +this.state.end;
+        this.state.start = this.state.date+ " " +this.state.start;
+        this.state.end = this.state.date+ " " +this.state.end;
         this.props.update(this.state.id, this.state.start, this.state.end, this.state.title, this.state.summary)
         this.props.callback(this.props.visible);
     }
@@ -167,55 +169,50 @@ class EditFormScreen extends Component {
                             placeholder="Event" style={{fontSize: 18}} />
                         <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
                             <Grid>
-                                <Col size={60}>
-                                    <View style={{flexDirection: 'row'}}>
+                                <Col size={55} style={{borderRightColor: 'grey', borderRightWidth: 1,}}>
+                                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'flex-start',}}>
                                         <TouchableOpacity block onPress={this.showDatePicker}>
-                                            <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                
+                                            {/* <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                 */}
+                                            <Text style={{textAlign: 'center', fontSize: 28, color:'#686767'}}>{this.state.date}</Text>
                                         </TouchableOpacity>
-                                        <Text style={{left: 2, fontWeight:'bold', textAlign: 'center', fontSize: 28, color:'#FF9A00'}}>{this.state.date}</Text>
                                     </View>
                                 </Col>
-                            </Grid>
-                        </CardItem>
-                        <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
-                            <Grid>
-                                <Col size={60}>
-                                    <View style={{flexDirection: 'row',}}>
-                                        <TouchableOpacity block onPress={this.showStartTimePicker}>
-                                            <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} />
-                                        </TouchableOpacity>
-                                        <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.start}</Text>
-                                    </View>
-                                </Col>
-                                <DateTimePicker mode="time" is24Hour={false}
-                                    isVisible={this.state.isStartTimePickerVisible}
-                                    onConfirm={this.handleStartTimePicked}
-                                    onCancel={this.hideStartTimePicker} />
-                                <DateTimePicker mode="time" is24Hour={false}
-                                    isVisible={this.state.isEndTimePickerVisible}
-                                    onConfirm={this.handleEndTimePicked}
-                                    onCancel={this.hideEndTimePicker} />
-                                <DateTimePicker mode="date" is24Hour={false}
-                                    isVisible={this.state.isDatePickerVisible}
-                                    onConfirm={this.handleDatePicked}
-                                    onCancel={this.hideDatePicker} />
-                            </Grid>
-                        </CardItem>
-                        <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
-                            <Grid>
-                                <Col size={60}>
-                                    <View style={{flexDirection: 'row',}}>
-                                        <TouchableOpacity block onPress={this.showEndTimePicker}>
-                                            <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} />
-                                        </TouchableOpacity>
-                                        {this.state.isErrorEndTime
-                                            ? <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 22, color:'red'}}>{this.state.end}</Text>
-                                            : <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.end}</Text>
-                                        }
-                                        {/* <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.end}</Text> */}
-                                    </View>
+                                <Col size={45}>
+                                    <Row size={50}>
+                                        <View style={{flex: 1, alignItems: 'center',}}>
+                                            <TouchableOpacity block onPress={this.showStartTimePicker}>
+                                                {/* <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} /> */}
+                                                <Text style={{ fontSize: 28, color:'#686767'}}>{this.state.start}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </Row>
+                                    <Row size={50}>
+                                        <View style={{flex: 1, alignItems: 'center',}}>
+                                            <TouchableOpacity block onPress={this.showEndTimePicker}>
+                                                {/* <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} /> */}
+                                                {this.state.isErrorEndTime
+                                                    ? <Text style={{fontSize: 22, color:'red'}}>{this.state.end}</Text>
+                                                    : <Text style={{fontSize: 28, color:'#686767'}}>{this.state.end}</Text>
+                                                }
+                                            </TouchableOpacity>
+                                            
+                                            {/* <Text style={{fontWeight:'bold', paddingLeft: 4, fontSize: 28, color:'#FF9A00'}}>{this.state.end}</Text> */}
+                                        </View>
+                                    </Row>
                                 </Col>
                             </Grid>
+                            <DateTimePicker mode="time" is24Hour={false}
+                                isVisible={this.state.isStartTimePickerVisible}
+                                onConfirm={this.handleStartTimePicked}
+                                onCancel={this.hideStartTimePicker} />
+                            <DateTimePicker mode="time" is24Hour={false}
+                                isVisible={this.state.isEndTimePickerVisible}
+                                onConfirm={this.handleEndTimePicked}
+                                onCancel={this.hideEndTimePicker} />
+                            <DateTimePicker mode="date" is24Hour={false}
+                                isVisible={this.state.isDatePickerVisible}
+                                onConfirm={this.handleDatePicked}
+                                onCancel={this.hideDatePicker} />
                         </CardItem>
                         <Button block style={{marginTop: 10,}} onPress={() => this.handleUpdateEvent()} >
                             <Text>Update</Text>

@@ -13,6 +13,7 @@ import EditFormScreen from './src/editForm';
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import AgendaScreen from './src/Agenda';
 import DemoScreen from './src/DemoScreen';
+import LoaderScreen from './src/LoaderScreen';
 
 class App extends Component {
   render() {
@@ -23,14 +24,17 @@ class App extends Component {
 }
 
 const AppNavigator = createStackNavigator({
+  Loader: {
+    screen: LoaderScreen
+  },
   Demo: {
     screen: DemoScreen
   },
-  Calender: {
-    screen: CalenderScreen
-  },
   Agenda: {
     screen: AgendaScreen
+  },
+  Calender: {
+    screen: CalenderScreen
   },
   Event:{
     screen: FormScreen

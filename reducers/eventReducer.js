@@ -1,5 +1,5 @@
-import {ADD_EVENT, ADD_SUB_EVENT, DELETE_EVENT, UPDATE_EVENT} from '../actions/type'
-import AsyncStorage from '@react-native-community/async-storage';
+import {ADD_EVENT, DELETE_EVENT, UPDATE_EVENT} from '../actions/type'
+import AsyncStorage from '@react-native-community/async-storage'
 
 const initialState = {
     id: 0,
@@ -22,24 +22,8 @@ const eventReducer = (state=initialState, action) => {
                     summary: action.payload.summary,
                 })
             })
-        // case ADD_SUB_EVENT:
-        //     return Object.assign({}, state, {
-        //         events: state.events.map((data)=>{
-        //             if(data.title === action.payload.title) {
-        //                 return {
-        //                     ...data,
-        //                     data: [...data.data,{
-        //                         id: action.payload.id,
-        //                         title: action.payload.title,
-        //                         hour: action.payload.hour,
-        //                         heading: action.payload.heading,
-        //                         description: action.payload.description,
-        //                     }],
-        //                 }
-        //             } else return
-        //         })
-        //     })
         case UPDATE_EVENT:
+            AsyncStorage.removeItem('DEMO');
             return Object.assign({}, state, { 
                 events: state.events.map((data)=>{ 
                     if(data.id === action.payload.id) {
@@ -54,6 +38,7 @@ const eventReducer = (state=initialState, action) => {
                 })
             })
         case DELETE_EVENT:
+            AsyncStorage.removeItem('DEMO')
             return Object.assign({}, state, { 
                 events: state.events.filter((data)=>{
                     if(data.id === action.payload) {       
