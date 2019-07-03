@@ -4,14 +4,24 @@ import { Container, Spinner } from 'native-base';
 import {connect} from 'react-redux'
 import {addEvent} from '../actions/events'
 import AsyncStorage from '@react-native-community/async-storage'
+import LottieLoader from 'react-native-lottie-loader';
 
 class LoaderScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            events: ''
+            events: '',
+            visible: true
         }
         this.checkStoredEvents();
+    }
+
+    componentDidMount() {
+        const context = this;
+    
+        setTimeout(() => {
+            context.setState({ visible: false });
+        }, 3000);
     }
 
     checkStoredEvents=()=>{
@@ -58,14 +68,9 @@ class LoaderScreen extends Component {
     }
     
     render() {
+        const { visible } = this.state;
         return (
-            <Container style={{backgroundColor: 'lightblue'}}>
-                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
-                    {/* <DoubleBounce size={10} color="#1CAFF6" style={{textAlign: 'center'}} /> */}
-                    <Spinner color='white' />
-                    <Text style={{color:'white', fontSize: 18, fontWeight: 'bold',}}>Loading...</Text>
-                </View>
-            </Container>
+            <LottieLoader visible={visible} />
         )
     }
 }

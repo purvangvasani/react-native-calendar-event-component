@@ -10,6 +10,7 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import { connect } from 'react-redux';
 import {ExpandableCalendar, CalendarProvider} from 'react-native-calendars';
 import AsyncStorage from '@react-native-community/async-storage'
+import Toast from 'react-native-simple-toast';
 
 let date = new Date(Date.now())
 let { width } = Dimensions.get('window')
@@ -41,13 +42,7 @@ class DemoScreen extends Component {
         this.setState({
             isModalVisible
         });
-        // AsyncStorage.getItem('DEMO').then((data)=>{
-        //     if(data.length != 0){
-        //         this.setState({
-        //             event: JSON.parse(data)
-        //         });
-        //     }
-        // })
+        Toast.show("Added!",Toast.LONG,Toast.BOTTOM)
     }
     getEditModalResponse(editModalVisible) {
         this.setState({
@@ -92,12 +87,12 @@ class DemoScreen extends Component {
         //     viewModalVisible: !this.state.viewModalVisible,
         // })
     };
-
     deleteEvent=(value)=>{
         this.props.delete(value);
         this.setState({
             viewModalVisible: !this.state.viewModalVisible,
         })
+        Toast.show("Deleted!",Toast.LONG,Toast.BOTTOM)
     }
     handleViewEvent = (value) => {
         this.setState({ viewModalVisible: true, result: value});
@@ -165,10 +160,25 @@ class DemoScreen extends Component {
         }, ()=>this.setState({date: day}));
     };
 
+    getMarkedDates = () => {
+        const marked = {};
+        let ITEMS = this.props.event
+        
+        if(ITEMS.length > 0){
+            for(let i = 0;i < ITEMS.length; i++){
+                let date = ITEMS[i].start.substr(0, 10).trim();
+                marked[date] = {marked:true};
+            }
+        }
+        return marked;
+    }
+    
+
     render() {
+        let ITEMS = this.props.event
         return (
-            <View style={{ flex: 1, marginTop: 20 }}>
-                <CalendarProvider onDateChanged={this.onDateChanged} theme={{todayButtonTextColor: '#0059ff'}}>
+            <View style={{ flex: 1 }}>
+                <CalendarProvider date={ITEMS.date} onDateChanged={this.onDateChanged} theme={{todayButtonTextColor: '#0059ff'}}>
                     <ExpandableCalendar 
                         // horizontal={true}
                         // hideArrows
@@ -176,7 +186,7 @@ class DemoScreen extends Component {
                         // hideKnob
                         // initialPosition={'open'} // ExpandableCalendar.positions.OPEN - can't find static positions
                         firstDay={1}
-                        // markedDates={this.getMarkedDates()} // {'2019-06-01': {marked: true}, '2019-06-02': {marked: true}, '2019-06-03': {marked: true}};
+                        markedDates={this.getMarkedDates()} // {'2019-06-01': {marked: true}, '2019-06-02': {marked: true}, '2019-06-03': {marked: true}};
                         calendarStyle={styles.calendar}
                         theme={this.getTheme()}
                         leftArrowImageSource={require('../src/img/previous.png')}
@@ -205,7 +215,7 @@ class DemoScreen extends Component {
                     animationOutTiming={600}
                     backdropTransitionInTiming={600}
                     backdropTransitionOutTiming={600} >
-                            <View style={{ flex: 1 }}>
+                            <View style={{ flex: 1}}>
                                 <TouchableOpacity onPress={this.toggleModal}>
                                     <Icon name="angle-left" size={40} style={{ color: "white" }} />
                                 </TouchableOpacity>
@@ -215,9 +225,9 @@ class DemoScreen extends Component {
                                     callback={this.getAddModalResponse.bind(this)}
                                 />
                             </View>
-                    </Modal>
+                </Modal>
                 <Modal
-                        style={{ marginTop: 100, paddingBottom: 225 }}
+                        style={{ marginTop: 100, paddingBottom: 155 }}
                         backdropColor="grey"
                         backdropOpacity={1}
                         isVisible={this.state.viewModalVisible}
