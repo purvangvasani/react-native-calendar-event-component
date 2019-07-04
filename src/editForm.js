@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Container, Content, Form, Item, Label, Input, Button, Text, Textarea, Grid, Row, Col, Card, CardItem } from 'native-base';
 import {connect} from 'react-redux'
 import DateTimePicker from "react-native-modal-datetime-picker";
-import {addEvent, updateEvent} from '../actions/events'
-import { TouchableOpacity, View } from 'react-native';
+import {addEvent, updateEvent, deleteEvent} from '../actions/events'
+import { TouchableOpacity, View, TextInput } from 'react-native';
 import Modal from 'react-native-modal'
 import Icon from 'react-native-vector-icons/EvilIcons'
 
@@ -17,10 +17,13 @@ class EditFormScreen extends Component {
             end: '',
             summary: this.props.data.summary,
             date: '',
+            fromDate: this.props.data.fromDate,
+            toDate: this.props.data.toDate,
             isErrorEndTime: false,
             isStartTimePickerVisible: false,
             isEndTimePickerVisible: false,
-            isDatePickerVisible: false,
+            isFromDatePickerVisible: false,
+            isToDatePickerVisible: false,
             isModalVisible: true
         };
         let date = this.props.data.start.substr(0,10).trim()
@@ -37,8 +40,11 @@ class EditFormScreen extends Component {
     showEndTimePicker = () => {
         this.setState({ isEndTimePickerVisible: true });
     };
-    showDatePicker = () => {
-        this.setState({ isDatePickerVisible: true });
+    showFromDatePicker = () => {
+        this.setState({ isFromDatePickerVisible: true });
+    };
+    showToDatePicker = () => {
+        this.setState({ isToDatePickerVisible: true });
     };
 
     handleStartTimePicked = (date) => {
@@ -70,46 +76,58 @@ class EditFormScreen extends Component {
         
         this.hideEndTimePicker();
     };
-    handleDatePicked = (value) => {
+    handleFromDatePicked = (value) => {
         let datetime = value.toString()
         let day = datetime.substr(8,2)
         let month = datetime.substr(4,3)
         let year = datetime.substr(11,4)
-        this.convertMonth(month);
-        datetime = year+"-"+this.state.month+"-"+day
+        month = this.convertMonth(month);
+        datetime = year+"-"+month+"-"+day
         this.setState({
-            date: datetime
+            fromDate: datetime
         })
-        this.hideDatePicker();
+        this.hideFromDatePicker();
+    };
+    handleToDatePicked = (value) => {
+        let datetime = value.toString()
+        let day = datetime.substr(8,2)
+        let month = datetime.substr(4,3)
+        let year = datetime.substr(11,4)
+        month = this.convertMonth(month);
+        datetime = year+"-"+month+"-"+day
+        this.setState({
+            toDate: datetime
+        })
+        this.hideToDatePicker();
     };
 
     convertMonth=(month)=>{
         
         switch(month){
             case 'Jan':
-                return this.setState({ month: '01' });
+                return '01'
             case 'Feb':
-                return this.setState({ month: '02' });
+                return '02'
             case 'Mar':
-                return this.setState({ month: '03' });
+                return '03'
             case 'Apr':
-                return this.setState({ month: '04' });
+                return '04'
             case 'May':
-                return this.setState({ month: '05' });
+                return '05'
             case 'Jun':
-                return this.setState({ month: '06' });
+                return '06'
             case 'Jul':
-                return this.setState({ month: '07' });
+                return '07'
             case 'Aug':
-                return this.setState({ month: '08' });
+                return '08'
             case 'Sep':
-                return this.setState({ month: '09' });
+                return '09'
             case 'Oct':
-                return this.setState({ month: '10' });
+                return '10'
             case 'Nov':
-                return this.setState({ month: '11' });
+                return '11'
             case 'Dec':
-                return this.setState({ month: '12' });
+                return '12'
         }
     }
      
@@ -119,14 +137,45 @@ class EditFormScreen extends Component {
     hideEndTimePicker = () => {
         this.setState({ isEndTimePickerVisible: false });
     };
-    hideDatePicker = () => {
-        this.setState({ isDatePickerVisible: false });
+    hideFromDatePicker = () => {
+        this.setState({ isFromDatePickerVisible: false });
+    };
+    hideToDatePicker = () => {
+        this.setState({ isToDatePickerVisible: false });
     };
 
+    getDateArray(from, to){
+        var arr = [];
+        var from = new Date(from);
+        var to = new Date(to);
+        
+        while (from <= to) {
+            arr.push(new Date(from));
+            from.setDate(from.getDate() + 1);
+        }
+        return arr;
+    }
     handleUpdateEvent(){
-        this.state.start = this.state.date+ " " +this.state.start;
-        this.state.end = this.state.date+ " " +this.state.end;
-        this.props.update(this.state.id, this.state.start, this.state.end, this.state.title, this.state.summary)
+        let dateArray = []
+        var dateArr = this.getDateArray(this.state.fromDate, this.state.toDate);
+        for(let i=0; i<dateArr.length; i++){
+            let datetime = dateArr[i].toString()
+            let day = datetime.substr(8,2).trim()
+            let month = datetime.substr(4,3).trim()
+            let year = datetime.substr(11,4).trim()
+            month = this.convertMonth(month);
+            datetime = year+"-"+month+"-"+day;
+            dateArray.push(datetime)
+        }
+        this.props.delete(this.props.data.id);
+        
+        for(let i=0; i<dateArray.length; i++){
+            let fromDate = dateArray[i].toString()+ " " +this.state.start;
+            let toDate = dateArray[i].toString()+ " " +this.state.end;
+
+            this.props.add(this.state.id, this.state.fromDate, this.state.toDate, fromDate, toDate, this.state.title, this.state.summary)
+        }
+
         this.props.callback(this.props.visible);
     }
 
@@ -142,7 +191,6 @@ class EditFormScreen extends Component {
     }
 
     render() {
-        
         return (
             <Container>
                 <Content padder>
@@ -150,14 +198,14 @@ class EditFormScreen extends Component {
                             <Text style={{color: 'grey', fontSize: 17,left: 7, top: 4, fontWeight:'bold'}}>Event no. {this.state.id} Details</Text>
                         </View>
                     <Card>
-                        <CardItem style={{borderBottomColor: 'grey', borderBottomWidth: 1}}>
+                        <CardItem style={{borderBottomColor: 'lightgrey', borderBottomWidth: 1}}>
                             <Grid>
                                 <Col size={90}>
-                                    <Input placeholder="Event Title" name="title"
+                                    <TextInput placeholder="Event Title" name="title"
                                         onChangeText={this.handleEventHeadingChange}
                                         ref={(input)=> this.getTitle = input}
                                         value={this.state.title}
-                                        style={{fontSize: 20, color:'#E7516F', fontWeight: 'bold',}} />
+                                        style={{fontSize: 20, color:'#E7516F', padding: 0, fontWeight: 'bold',}} />
                                 </Col>
                             </Grid>
                         </CardItem>
@@ -166,23 +214,43 @@ class EditFormScreen extends Component {
                             onChangeText={this.handleEventDescriptionChange}
                             style={{color:'#E7516F'}}
                             value={this.state.summary}
-                            placeholder="Event" style={{fontSize: 18}} />
-                        <CardItem style={{borderTopColor: 'grey', borderTopWidth: 1}}>
+                            placeholder="Event" style={{fontSize: 16}} />
+                        <CardItem style={{borderTopColor: 'lightgrey', borderTopWidth: 1}}>
                             <Grid>
-                                <Col size={55} style={{borderRightColor: 'grey', borderRightWidth: 1,}}>
-                                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'flex-start',}}>
-                                        <TouchableOpacity block onPress={this.showDatePicker}>
-                                            {/* <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                 */}
-                                            <Text style={{textAlign: 'center', fontSize: 28, color:'#686767'}}>{this.state.date}</Text>
-                                        </TouchableOpacity>
+                                <Col size={10}>
+                                    <View style={{flex: 1,alignItems: 'flex-start'}}>
+                                        <Icon name="calendar" size={30} style={{color:'#686767', top:4 }} />
                                     </View>
                                 </Col>
-                                <Col size={45}>
+                                <Col size={45} style={{borderRightColor: 'lightgrey', borderRightWidth: 1,}}>
+                                    <Row size={50}>
+                                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
+                                            <TouchableOpacity block onPress={this.showFromDatePicker}>
+                                                {/* <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                 */}
+                                                <Text style={{textAlign: 'center', fontSize: 20, color:'#686767'}}>{this.state.fromDate}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </Row>
+                                    <Row size={50}>
+                                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
+                                            <TouchableOpacity block onPress={this.showToDatePicker}>
+                                                {/* <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                 */}
+                                                <Text style={{textAlign: 'center', fontSize: 20, color:'#686767'}}>{this.state.toDate}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </Row>
+                                </Col>
+                                <Col size={10}>
+                                    <View style={{flex: 1,alignItems: 'flex-start'}}>
+                                        <Icon name="clock" size={30} style={{color:'#686767', top:4, left: 3 }} />
+                                    </View>
+                                </Col>
+                                <Col size={35}>
                                     <Row size={50}>
                                         <View style={{flex: 1, alignItems: 'center',}}>
                                             <TouchableOpacity block onPress={this.showStartTimePicker}>
                                                 {/* <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} /> */}
-                                                <Text style={{ fontSize: 28, color:'#686767'}}>{this.state.start}</Text>
+                                                <Text style={{ fontSize: 20, color:'#686767'}}>{this.state.start}</Text>
                                             </TouchableOpacity>
                                         </View>
                                     </Row>
@@ -191,8 +259,8 @@ class EditFormScreen extends Component {
                                             <TouchableOpacity block onPress={this.showEndTimePicker}>
                                                 {/* <Icon name="clock" size={32} style={{left: 2, color: 'blue', top: 7}} /> */}
                                                 {this.state.isErrorEndTime
-                                                    ? <Text style={{fontSize: 22, color:'red'}}>{this.state.end}</Text>
-                                                    : <Text style={{fontSize: 28, color:'#686767'}}>{this.state.end}</Text>
+                                                    ? <Text style={{fontSize: 18, color:'red'}}>{this.state.end}</Text>
+                                                    : <Text style={{fontSize: 20, color:'#686767'}}>{this.state.end}</Text>
                                                 }
                                             </TouchableOpacity>
                                             
@@ -210,11 +278,15 @@ class EditFormScreen extends Component {
                                 onConfirm={this.handleEndTimePicked}
                                 onCancel={this.hideEndTimePicker} />
                             <DateTimePicker mode="date" is24Hour={false}
-                                isVisible={this.state.isDatePickerVisible}
-                                onConfirm={this.handleDatePicked}
-                                onCancel={this.hideDatePicker} />
+                                isVisible={this.state.isFromDatePickerVisible}
+                                onConfirm={this.handleFromDatePicked}
+                                onCancel={this.hideFromDatePicker} />
+                            <DateTimePicker mode="date" is24Hour={false}
+                                isVisible={this.state.isToDatePickerVisible}
+                                onConfirm={this.handleToDatePicked}
+                                onCancel={this.hideToDatePicker} />
                         </CardItem>
-                        <Button block style={{marginTop: 10,}} onPress={() => this.handleUpdateEvent()} >
+                        <Button block onPress={() => this.handleUpdateEvent()} >
                             <Text>Update</Text>
                         </Button>
                     </Card>
@@ -232,8 +304,14 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        update: (id, start, end, title, summary) => {   
-            dispatch(updateEvent(id, start, end, title, summary))
+        add: (id, fromDate, toDate, startTime, endTime, title, summary) => {   
+            dispatch(addEvent(id, fromDate, toDate, startTime, endTime, title, summary))
+        },
+        update: (id, toDate, fromDate, start, end, title, summary) => {   
+            dispatch(updateEvent(id, toDate, fromDate, start, end, title, summary))
+        },
+        delete: id => {
+            dispatch(deleteEvent(id));
         }
     }
 }

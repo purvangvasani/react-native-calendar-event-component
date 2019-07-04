@@ -3,6 +3,8 @@ import AsyncStorage from '@react-native-community/async-storage'
 
 const initialState = {
     id: 0,
+    toDate: '',
+    fromDate: '',
     start: '',
     end: '',
     title: '',
@@ -16,6 +18,8 @@ const eventReducer = (state=initialState, action) => {
             return Object.assign({}, state, {
                 events: state.events.concat({
                     id: action.payload.id,
+                    fromDate: action.payload.fromDate,
+                    toDate: action.payload.toDate,
                     start: action.payload.startTime,
                     end: action.payload.endTime,
                     title: action.payload.title,
@@ -29,6 +33,8 @@ const eventReducer = (state=initialState, action) => {
                     if(data.id === action.payload.id) {
                         return {
                             id: action.payload.id,
+                            fromDate: action.payload.fromDate,
+                            toDate: action.payload.toDate,
                             start: action.payload.start,
                             end: action.payload.end,
                             title: action.payload.title,

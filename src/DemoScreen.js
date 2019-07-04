@@ -67,7 +67,6 @@ class DemoScreen extends Component {
     };
 
     handleDeleteEvent = (value) => {
-
         Alert.alert(
             'Sure you want to delete this event?',
             '',
@@ -82,10 +81,6 @@ class DemoScreen extends Component {
             ],
             {cancelable: false},
           );
-        // this.props.delete(value);
-        // this.setState({
-        //     viewModalVisible: !this.state.viewModalVisible,
-        // })
     };
     deleteEvent=(value)=>{
         this.props.delete(value);
@@ -103,6 +98,7 @@ class DemoScreen extends Component {
         this.state.start = start
         this.state.end = end
     };
+
     handleUpdateEvent = (value) => {
         this.setState({ viewModalVisible: !this.state.viewModalVisible, editModalVisible: true });
     };
@@ -217,7 +213,7 @@ class DemoScreen extends Component {
                     backdropTransitionOutTiming={600} >
                             <View style={{ flex: 1}}>
                                 <TouchableOpacity onPress={this.toggleModal}>
-                                    <Icon name="angle-left" size={40} style={{ color: "white" }} />
+                                    <Icon name="angle-left" size={30} style={{ color: "white" }} />
                                 </TouchableOpacity>
                                 <FormScreen
                                     date={this.state.date}
@@ -227,162 +223,164 @@ class DemoScreen extends Component {
                             </View>
                 </Modal>
                 <Modal
-                        style={{ marginTop: 100, paddingBottom: 155 }}
-                        backdropColor="grey"
-                        backdropOpacity={1}
-                        isVisible={this.state.viewModalVisible}
-                        animationIn="zoomInDown"
-                        animationOut="zoomOutUp"
-                        animationInTiming={600}
-                        animationOutTiming={600}
-                        backdropTransitionInTiming={600}
-                        backdropTransitionOutTiming={600} >
-                        <View style={{ flex: 1 }}>
-                            <Container>
-                                <Content padder>
-                                    <View style={{ flex:1, flexDirection: "row" }}>
-                                        <View style={{flexDirection: "row", flex: 2, alignItems: 'flex-start', justifyContent: 'flex-start'}}>
-                                            <TouchableOpacity onPress={this.viewToggleModal}>
-                                                <Icon
-                                                    name="chevron-left"
-                                                    size={24}
-                                                    style={{ color: "grey" }}
-                                                />
-                                            </TouchableOpacity>
-                                            <Text
-                                                style={{
-                                                    color: "grey",
-                                                    left: 2,
-                                                    fontSize: 17,
-                                                    top: 1,
-                                                    fontWeight: "bold"
-                                                }}>
-                                                Event on ({this.state.result.id}) Details
-                                            </Text>
-                                        </View>
-                                        <View style={{flexDirection: "row", flex:3, justifyContent: 'flex-end'}}>
-                                            <TouchableOpacity style={{right: 16}} onPress={this.handleUpdateEvent}>
-                                                <Icon
-                                                    name="edit"
-                                                    size={22}
-                                                    style={{ color: "green"}} />
-                                            </TouchableOpacity>
-                                        
-                                            <TouchableOpacity style={{right: 8}} onPress={this.handleDeleteEvent.bind(this, this.state.result.id)}>
-                                                <Icon
-                                                name="trash-alt"
-                                                size={22}
-                                                style={{ color: "red", }} />
-                                            </TouchableOpacity>
-                                        </View>
+                    // style={{ marginTop: 110, paddingBottom: 180 }}
+                    backdropColor="grey"
+                    backdropOpacity={1}
+                    isVisible={this.state.viewModalVisible}
+                    animationIn="zoomInDown"
+                    animationOut="zoomOutUp"
+                    animationInTiming={600}
+                    animationOutTiming={600}
+                    backdropTransitionInTiming={600}
+                    backdropTransitionOutTiming={600} >
+                    <View style={{ flex: 1 }}>
+                        <Container>
+                            <Content padder>
+                                <View style={{ flex:1, flexDirection: "row" }}>
+                                    <View style={{flexDirection: "row", flex: 2, alignItems: 'flex-start', justifyContent: 'flex-start'}}>
+                                        <TouchableOpacity onPress={this.viewToggleModal}>
+                                            <Icon
+                                                name="chevron-left"
+                                                size={24}
+                                                style={{ color: "grey" }}
+                                            />
+                                        </TouchableOpacity>
+                                        <Text
+                                            style={{
+                                                color: "grey",
+                                                left: 2,
+                                                fontSize: 17,
+                                                top: 1,
+                                                fontWeight: "bold"
+                                            }}>
+                                            Event Details
+                                        </Text>
                                     </View>
-                                    <Card>
-                                        <CardItem
-                                            style={{ borderBottomColor: "grey", borderBottomWidth: 1 }}>
-                                            <Grid>
-                                                <Col size={10}>
+                                    <View style={{flexDirection: "row", flex:3, justifyContent: 'flex-end'}}>
+                                        <TouchableOpacity style={{right: 16}} onPress={this.handleUpdateEvent}>
+                                            <Icon
+                                                name="edit"
+                                                size={22}
+                                                style={{ color: "green"}} />
+                                        </TouchableOpacity>
+                                    
+                                        <TouchableOpacity style={{right: 8}} onPress={this.handleDeleteEvent.bind(this, this.state.result.id)}>
+                                            <Icon
+                                            name="trash-alt"
+                                            size={22}
+                                            style={{ color: "red", }} />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                                <Card>
+                                    <CardItem
+                                        style={{ borderBottomColor: "lightgrey", borderBottomWidth: 1 }}>
+                                        <Grid>
+                                            <Col size={10}>
+                                                <Icon
+                                                    name="link"
+                                                    size={20}
+                                                    style={{ color: "#E7516F", top: 3 }}/>      
+                                            </Col>
+                                            <Col size={90}>
+                                                <Text
+                                                    style={{
+                                                    fontSize: 20,
+                                                    color: "#E7516F",
+                                                    fontWeight: "bold"
+                                                    }}>
+                                                    {this.state.result.title}
+                                                </Text>
+                                            </Col>
+                                        </Grid>
+                                    </CardItem>
+                                    <CardItem>
+                                        <Grid>
+                                            <Col size={10}>
+                                                {/* <Icon name="comment" size={30} style={{color: '#E7516F', top: 2}} /> */}
+                                            </Col>
+                                            <Col size={90}>
+                                                <Text style={{ height: 80, color: "#E7516F" }}>
+                                                    {this.state.result.summary}
+                                                </Text>
+                                            </Col>
+                                        </Grid>
+                                    </CardItem>
+                                    <CardItem style={{ borderTopColor: "lightgrey", borderTopWidth: 1 }}>
+                                        <Grid>
+                                            <Col size={10}>
+                                                <Icon name="calendar" size={20} style={{ color: "#FF9A00", top: 4 }} />
+                                            </Col>
+                                            <Col size={90}>
+                                                <View style={{flexDirection: 'row',}}>
+                                                    <Text style={{ fontWeight: "bold", fontSize: 20, color: "#FF9A00" }} >
+                                                        {this.state.result.fromDate} / {this.state.result.toDate}
+                                                    </Text>
+                                                </View>
+                                            </Col>
+                                        </Grid>
+                                    </CardItem>
+                                    <CardItem
+                                        style={{ borderTopColor: "lightgrey", borderTopWidth: 1 }} >
+                                        <Grid>
+                                            <Col size={55}>
+                                                <View style={{ flexDirection: "row" }}>
                                                     <Icon
-                                                        name="link"
-                                                        size={24}
-                                                        style={{ color: "#E7516F", top: 3 }}/>      
-                                                </Col>
-                                                <Col size={90}>
+                                                        name="clock"
+                                                        size={20}
+                                                        style={{ color: "#FF9A00", top: 3 }}
+                                                    />
                                                     <Text
                                                         style={{
+                                                        left: 5,
+                                                        fontWeight: "bold",
+                                                        textAlign: "center",
                                                         fontSize: 20,
-                                                        color: "#E7516F",
-                                                        fontWeight: "bold"
-                                                        }}>
-                                                        {this.state.result.title}
+                                                        color: "#FF9A00" }} >
+                                                        {this.state.start} - {this.state.end}
                                                     </Text>
-                                                </Col>
-                                            </Grid>
-                                        </CardItem>
-                                        <CardItem>
-                                            <Grid>
-                                                <Col size={10}>
-                                                    {/* <Icon name="comment" size={30} style={{color: '#E7516F', top: 2}} /> */}
-                                                </Col>
-                                                <Col size={90}>
-                                                    <Text style={{ height: 100, color: "#E7516F" }}>
-                                                        {this.state.result.summary}
-                                                    </Text>
-                                                </Col>
-                                            </Grid>
-                                        </CardItem>
-                                        <CardItem style={{ borderTopColor: "grey", borderTopWidth: 1 }}>
-                                            <Grid>
-                                                <Col size={55}>
-                                                    <View style={{flexDirection: 'row',}}>
-                                                        <Icon name="calendar" size={26} style={{ color: "#FF9A00", top: 7 }} />
-                                                        <Text style={{ left: 5, fontWeight: "bold", textAlign: "center", fontSize: 28, color: "#FF9A00" }} >
-                                                            {this.state.day}
-                                                        </Text>
-                                                    </View>
-                                                </Col>
-                                            </Grid>
-                                        </CardItem>
-                                        <CardItem
-                                            style={{ borderTopColor: "grey", borderTopWidth: 1 }} >
-                                            <Grid>
-                                                <Col size={55}>
-                                                    <View style={{ flexDirection: "row" }}>
-                                                        <Icon
-                                                            name="clock"
-                                                            size={26}
-                                                            style={{ color: "#FF9A00", top: 7 }}
-                                                        />
-                                                        <Text
-                                                            style={{
-                                                            left: 5,
-                                                            fontWeight: "bold",
-                                                            textAlign: "center",
-                                                            fontSize: 28,
-                                                            color: "#FF9A00" }} >
-                                                            {this.state.start} - {this.state.end}
-                                                        </Text>
-                                                    </View>
-                                                </Col>
-                                            </Grid>
-                                        </CardItem>
-                                    </Card>
-                                </Content>
-                            </Container>
-                        </View>
-                    </Modal>
+                                                </View>
+                                            </Col>
+                                        </Grid>
+                                    </CardItem>
+                                </Card>
+                            </Content>
+                        </Container>
+                    </View>
+                </Modal>
                 <Modal
-                        style={{ top: 30, marginBottom: 100 }}
-                        isVisible={this.state.editModalVisible}
-                        backdropColor="grey"
-                        backdropOpacity={1}
-                        animationIn="zoomInDown"
-                        animationOut="zoomOutUp"
-                        animationInTiming={600}
-                        animationOutTiming={600}
-                        backdropTransitionInTiming={600}
-                        backdropTransitionOutTiming={600} >
-                        <View style={{ flex: 1 }}>
-                            <TouchableOpacity onPress={this.editToggleModal}>
-                                <Icon name="chevron-left" size={24} style={{ color: "white" }} />
-                            </TouchableOpacity>
-                            <EditFormScreen
-                                data={this.state.result}
-                                visible={false}
-                                callback={this.getEditModalResponse.bind(this)}
-                            />
-                        </View>
-                    </Modal>
+                    // style={{ top: 30, marginBottom: 100 }}
+                    isVisible={this.state.editModalVisible}
+                    backdropColor="grey"
+                    backdropOpacity={1}
+                    animationIn="zoomInDown"
+                    animationOut="zoomOutUp"
+                    animationInTiming={600}
+                    animationOutTiming={600}
+                    backdropTransitionInTiming={600}
+                    backdropTransitionOutTiming={600} >
+                    <View style={{ flex: 1 }}>
+                        <TouchableOpacity onPress={this.editToggleModal}>
+                            <Icon name="chevron-left" size={24} style={{ color: "white" }} />
+                        </TouchableOpacity>
+                        <EditFormScreen
+                            data={this.state.result}
+                            visible={false}
+                            callback={this.getEditModalResponse.bind(this)}
+                        />
+                    </View>
+                </Modal>
                 <Fab
-                        active={this.state.active}
-                        direction="up"
-                        containerStyle={{ }}
-                        style={{ backgroundColor: '#5067FF' }}
-                        position="bottomRight"
-                        onPress={() => {
-                            this.setState({ isModalVisible: true });
-                        }}>
-                        <Icon name="plus" />
-                    </Fab>
+                    active={this.state.active}
+                    direction="up"
+                    containerStyle={{ }}
+                    style={{ backgroundColor: '#5067FF' }}
+                    position="bottomRight"
+                    onPress={() => {
+                        this.setState({ isModalVisible: true });
+                    }}>
+                    <Icon name="plus" />
+                </Fab>
             </View>
         );
     }
@@ -429,6 +427,7 @@ const styles = StyleSheet.create({
       textAlign: "center",
     }
 });
+
 const mapStateToProps = state => {
     AsyncStorage.setItem('DEMO', JSON.stringify(state.event.events))
     return {

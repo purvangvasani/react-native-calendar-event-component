@@ -27,36 +27,23 @@ class LoaderScreen extends Component {
     checkStoredEvents=()=>{
         try{
             AsyncStorage.getItem('DEMO').then((value) => {
-                // console.log('====================================');
-                // console.log('JSON.parse(value).length != 0: ', value != null);
-                // console.log('====================================');
                 if(value != null){
-                    // console.log('====================================');
-                    // console.log(JSON.parse(value));
-                    // console.log('====================================');
                     if(JSON.parse(value).length != 0){
-                        // console.log('====================================');
-                        // console.log('Data not Null', value.length);
-                        // console.log(JSON.parse(value));
-                        // console.log('====================================');
-                        for(let i=0; i<JSON.parse(value).length; i++){
-                            // console.log('====================================');
-                            // console.log(JSON.parse(value)[i].id, JSON.parse(value)[i].start, JSON.parse(value)[i].end, JSON.parse(value)[i].title, JSON.parse(value)[i].summary);
-                            // console.log('====================================');
-                            this.props.add(JSON.parse(value)[i].id, JSON.parse(value)[i].start, JSON.parse(value)[i].end, JSON.parse(value)[i].title, JSON.parse(value)[i].summary);
+                        if(this.props.event.length == 0){
+                            for(let i=0; i<JSON.parse(value).length; i++){
+                                this.props.add(JSON.parse(value)[i].id, JSON.parse(value)[i].fromDate, JSON.parse(value)[i].toDate, JSON.parse(value)[i].start, JSON.parse(value)[i].end, JSON.parse(value)[i].title, JSON.parse(value)[i].summary);
+                            }
                         }
-                        // console.log('====================================');
-                        // console.log('for loop over');
-                        // console.log('====================================');
                         this.props.navigation.navigate('Demo')
                     }
-                    else if(JSON.parse(value).length == 0){
-                        this.props.navigation.navigate('Demo')
-                    }
+                    // else if(JSON.parse(value).length == 0){
+                    //     this.props.navigation.navigate('Demo')
+                    // }
                 }
-                else{
-                    this.props.navigation.navigate('Demo')
-                }
+                // else{
+                //     this.props.navigation.navigate('Demo')
+                // }
+                this.props.navigation.navigate('Demo')
             })
         }
         catch{
@@ -77,7 +64,6 @@ class LoaderScreen extends Component {
 
 const mapStateToProps = state => {
     console.log('Store Data', state.event.events);
-    
     return {
         event: state.event.events
     }
@@ -85,8 +71,8 @@ const mapStateToProps = state => {
   
 const mapDispatchToProps = dispatch => {
     return {
-        add: (id, startTime, endTime, title, summary) => {   
-            dispatch(addEvent(id, startTime, endTime, title, summary))
+        add: (id, fromDate, toDate, startTime, endTime, title, summary) => {   
+            dispatch(addEvent(id, fromDate, toDate, startTime, endTime, title, summary))
         }
     }
 }
