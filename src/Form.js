@@ -87,7 +87,7 @@ class FormScreen extends Component {
         let month = datetime.substr(4,3).trim()
         let year = datetime.substr(11,4).trim()
         month = this.convertMonth(month);
-        datetime = year+"-"+month+"-"+day
+        datetime = year+"-"+month+"-"+day       
         this.setState({
             toDate: datetime
         })
