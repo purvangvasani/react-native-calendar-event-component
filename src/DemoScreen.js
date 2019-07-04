@@ -42,7 +42,7 @@ class DemoScreen extends Component {
         this.setState({
             isModalVisible
         });
-        Toast.show("Added!",Toast.LONG,Toast.BOTTOM)
+        // Toast.show("Added!",Toast.LONG,Toast.BOTTOM)
     }
     getEditModalResponse(editModalVisible) {
         this.setState({
@@ -211,19 +211,25 @@ class DemoScreen extends Component {
                     animationOutTiming={600}
                     backdropTransitionInTiming={600}
                     backdropTransitionOutTiming={600} >
-                            <View style={{ flex: 1}}>
-                                <TouchableOpacity onPress={this.toggleModal}>
-                                    <Icon name="angle-left" size={30} style={{ color: "white" }} />
-                                </TouchableOpacity>
-                                <FormScreen
-                                    date={this.state.date}
-                                    num={false}
-                                    callback={this.getAddModalResponse.bind(this)}
-                                />
-                            </View>
+                        <View style={{ flex: 1 }}>
+                            <Container>
+                                <Content padder>
+                                    <View style={{flex: 1, flexDirection: 'row'}}>
+                                        <TouchableOpacity onPress={this.toggleModal}>
+                                            <Icon name="angle-left" size={30} style={{ color: "grey" }} />
+                                        </TouchableOpacity>
+                                        <Text style={{color:'grey', top: 3, left: 5, fontWeight: 'bold'}}>Add Event</Text>
+                                    </View>
+                                    <FormScreen
+                                        date={this.state.date}
+                                        num={false}
+                                        callback={this.getAddModalResponse.bind(this)}
+                                    />
+                                </Content>
+                        </Container>
+                    </View>
                 </Modal>
                 <Modal
-                    // style={{ marginTop: 110, paddingBottom: 180 }}
                     backdropColor="grey"
                     backdropOpacity={1}
                     isVisible={this.state.viewModalVisible}
@@ -240,17 +246,16 @@ class DemoScreen extends Component {
                                     <View style={{flexDirection: "row", flex: 2, alignItems: 'flex-start', justifyContent: 'flex-start'}}>
                                         <TouchableOpacity onPress={this.viewToggleModal}>
                                             <Icon
-                                                name="chevron-left"
-                                                size={24}
+                                                name="angle-left"
+                                                size={30}
                                                 style={{ color: "grey" }}
                                             />
                                         </TouchableOpacity>
                                         <Text
                                             style={{
                                                 color: "grey",
-                                                left: 2,
-                                                fontSize: 17,
-                                                top: 1,
+                                                left: 5,
+                                                top: 3,
                                                 fontWeight: "bold"
                                             }}>
                                             Event Details
@@ -360,6 +365,24 @@ class DemoScreen extends Component {
                     backdropTransitionInTiming={600}
                     backdropTransitionOutTiming={600} >
                     <View style={{ flex: 1 }}>
+                            <Container>
+                                <Content padder>
+                                    <View style={{flex: 1, flexDirection: 'row'}}>
+                                        <TouchableOpacity onPress={this.editToggleModal}>
+                                            <Icon name="angle-left" size={30} style={{ color: "grey" }} />
+                                        </TouchableOpacity>
+                                        <Text style={{color:'grey', top: 3.5, left: 5, fontWeight: 'bold'}}>Edit Event Details</Text>
+                                    </View>
+                                    <EditFormScreen
+                                        data={this.state.result}
+                                        visible={false}
+                                        callback={this.getEditModalResponse.bind(this)}
+                                    />
+                                </Content>
+                        </Container>
+                    </View>
+
+                    {/* <View style={{ flex: 1 }}>
                         <TouchableOpacity onPress={this.editToggleModal}>
                             <Icon name="chevron-left" size={24} style={{ color: "white" }} />
                         </TouchableOpacity>
@@ -368,7 +391,7 @@ class DemoScreen extends Component {
                             visible={false}
                             callback={this.getEditModalResponse.bind(this)}
                         />
-                    </View>
+                    </View> */}
                 </Modal>
                 <Fab
                     active={this.state.active}

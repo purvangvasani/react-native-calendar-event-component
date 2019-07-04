@@ -5,7 +5,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import {addEvent, updateEvent, deleteEvent} from '../actions/events'
 import { TouchableOpacity, View, TextInput } from 'react-native';
 import Modal from 'react-native-modal'
-import Icon from 'react-native-vector-icons/EvilIcons'
+import Icon from 'react-native-vector-icons/Ionicons'
 
 class EditFormScreen extends Component {
     constructor(props) {
@@ -19,7 +19,9 @@ class EditFormScreen extends Component {
             date: '',
             fromDate: this.props.data.fromDate,
             toDate: this.props.data.toDate,
+            isErrorTitle: false,
             isErrorEndTime: false,
+            isErrorToDate: false,
             isStartTimePickerVisible: false,
             isEndTimePickerVisible: false,
             isFromDatePickerVisible: false,
@@ -64,7 +66,7 @@ class EditFormScreen extends Component {
         if(err < 0){
             this.setState({
                 isErrorEndTime: true,
-                end: 'Invalid Time',
+                end: time1,
             })
         }
         else{
@@ -95,9 +97,21 @@ class EditFormScreen extends Component {
         let year = datetime.substr(11,4)
         month = this.convertMonth(month);
         datetime = year+"-"+month+"-"+day
-        this.setState({
-            toDate: datetime
-        })
+        
+        let from = new Date(this.state.fromDate)
+        let to = new Date(datetime)
+        if(to < from){
+           this.setState({
+               isErrorToDate: true,
+               toDate: datetime
+           })
+        }
+        else if(to >= from){
+            this.setState({
+                isErrorToDate: false,
+                toDate: datetime
+            })
+        }
         this.hideToDatePicker();
     };
 
@@ -173,79 +187,114 @@ class EditFormScreen extends Component {
             let fromDate = dateArray[i].toString()+ " " +this.state.start;
             let toDate = dateArray[i].toString()+ " " +this.state.end;
 
-            this.props.add(this.state.id, this.state.fromDate, this.state.toDate, fromDate, toDate, this.state.title, this.state.summary)
+            if(!this.state.isErrorEndTime && !this.state.isErrorToDate){
+                if(this.state.title.length > 0){
+                    console.log('====================================');
+                    console.log(this.state.title);
+                    console.log('====================================');
+                    this.props.add(this.state.id, this.state.fromDate, this.state.toDate, fromDate, toDate, this.state.title, this.state.summary)            
+                    this.props.callback(this.props.visible);                    
+                }
+                else if(this.state.title.length == 0){
+                    let title = '(No Title)'
+                    this.props.add(this.state.id, this.state.fromDate, this.state.toDate, fromDate, toDate, this.state.title, this.state.summary)            
+                    this.props.callback(this.props.visible);                    
+                }
+            }
+            else if(this.state.isErrorToDate){
+            }
+            else if(this.state.isErrorEndTime){
+            }
+
         }
 
-        this.props.callback(this.props.visible);
     }
 
-    handleEventDescriptionChange=(value)=>{
+    handleEventSummaryChange=(value)=>{
         this.setState({
             summary: value,
         })
     }
-    handleEventHeadingChange=(value)=>{
-        this.setState({
-            title: value
-        })
+    handleEventTitleChange=(value)=>{
+        if(value.length <= 0){
+            this.setState({
+                isErrorTitle: true,
+                title: ''
+            })
+        }
+        else if(value.length > 0){
+            this.setState({
+                isErrorTitle: false,
+                title: value
+            })
+        }
     }
 
     render() {
         return (
-            <Container>
-                <Content padder>
-                        <View style={{flexDirection: 'row',}}>
-                            <Text style={{color: 'grey', fontSize: 17,left: 7, top: 4, fontWeight:'bold'}}>Event no. {this.state.id} Details</Text>
-                        </View>
-                    <Card>
-                        <CardItem style={{borderBottomColor: 'lightgrey', borderBottomWidth: 1}}>
-                            <Grid>
-                                <Col size={90}>
-                                    <TextInput placeholder="Event Title" name="title"
-                                        onChangeText={this.handleEventHeadingChange}
-                                        ref={(input)=> this.getTitle = input}
-                                        value={this.state.title}
-                                        style={{fontSize: 20, color:'#E7516F', padding: 0, fontWeight: 'bold',}} />
-                                </Col>
-                            </Grid>
-                        </CardItem>
-                        <Textarea ref={(input)=>this.getDescription = input}
-                            rowSpan={5} name="description" 
-                            onChangeText={this.handleEventDescriptionChange}
-                            style={{color:'#E7516F'}}
-                            value={this.state.summary}
-                            placeholder="Event" style={{fontSize: 16}} />
-                        <CardItem style={{borderTopColor: 'lightgrey', borderTopWidth: 1}}>
-                            <Grid>
-                                <Col size={10}>
+            <View style={{flex: 1}}>
+                    {/* <View style={{flexDirection: 'row',}}>
+                        <Text style={{color: 'grey', fontSize: 17,left: 7, top: 4, fontWeight:'bold'}}>Event no. {this.state.id} Details</Text>
+                    </View> */}
+                <Card>
+                    <CardItem style={{borderBottomColor: 'lightgrey', borderBottomWidth: 1}}>
+                        <Grid>
+                            <Col size={90}>
+                                <TextInput placeholder="Event Title" name="title"
+                                    onChangeText={this.handleEventTitleChange}
+                                    ref={(input)=> this.getTitle = input}
+                                    value={this.state.title}
+                                    style={{fontSize: 20, color:'#E7516F', padding: 0, fontWeight: 'bold',}} />
+                            </Col>
+                            <Col size={10}>
+                                {this.state.isErrorTitle 
+                                ?    <Icon name="ios-sad" size={30} style={{color:'red', top:4 }} />
+                                :   null
+                                }
+                            </Col>
+                        </Grid>
+                    </CardItem>
+                    <Textarea ref={(input)=>this.getDescription = input}
+                        rowSpan={5} name="description" 
+                        onChangeText={this.handleEventSummaryChange}
+                        style={{color:'#E7516F'}}
+                        value={this.state.summary}
+                        placeholder="Event" style={{fontSize: 16}} />
+                    <CardItem style={{borderTopColor: 'lightgrey', borderTopWidth: 1}}>
+                        <Grid>
+                            <Col size={10}>
+                                <View style={{flex: 1,alignItems: 'flex-start'}}>
+                                    <Icon name="md-calendar" size={30} style={{color:'#686767', top:4 }} />
+                                </View>
+                            </Col>
+                            <Col size={45} style={{borderRightColor: 'lightgrey', borderRightWidth: 1,}}>
+                                <Row size={50}>
+                                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
+                                        <TouchableOpacity block onPress={this.showFromDatePicker}>
+                                            {/* <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                 */}
+                                            <Text style={{textAlign: 'center', fontSize: 20, color:'#686767'}}>{this.state.fromDate}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </Row>
+                                <Row size={50}>
+                                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
+                                        <TouchableOpacity block onPress={this.showToDatePicker}>
+                                            {/* <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                 */}
+                                            {/* <Text style={{textAlign: 'center', fontSize: 20, color:'#686767'}}>{this.state.toDate}</Text> */}
+                                            {this.state.isErrorToDate
+                                                ? <Text style={{textAlign: 'center', fontSize: 18, color:'red'}}>{this.state.toDate}</Text>
+                                                : <Text style={{textAlign: 'center', fontSize: 20, color:'#686767'}}>{this.state.toDate}</Text>
+                                            }
+                                        </TouchableOpacity>
+                                    </View>
+                                </Row>
+                            </Col>
+                            <Col size={10}>
                                     <View style={{flex: 1,alignItems: 'flex-start'}}>
-                                        <Icon name="calendar" size={30} style={{color:'#686767', top:4 }} />
+                                        <Icon name="md-clock" size={30} style={{color:'#686767', top:4, left: 3 }} />
                                     </View>
                                 </Col>
-                                <Col size={45} style={{borderRightColor: 'lightgrey', borderRightWidth: 1,}}>
-                                    <Row size={50}>
-                                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
-                                            <TouchableOpacity block onPress={this.showFromDatePicker}>
-                                                {/* <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                 */}
-                                                <Text style={{textAlign: 'center', fontSize: 20, color:'#686767'}}>{this.state.fromDate}</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </Row>
-                                    <Row size={50}>
-                                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
-                                            <TouchableOpacity block onPress={this.showToDatePicker}>
-                                                {/* <Icon name="calendar" size={32} style={{color: 'blue', top: 7}} />                                                 */}
-                                                <Text style={{textAlign: 'center', fontSize: 20, color:'#686767'}}>{this.state.toDate}</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </Row>
-                                </Col>
-                                <Col size={10}>
-                                    <View style={{flex: 1,alignItems: 'flex-start'}}>
-                                        <Icon name="clock" size={30} style={{color:'#686767', top:4, left: 3 }} />
-                                    </View>
-                                </Col>
-                                <Col size={35}>
+                            <Col size={35}>
                                     <Row size={50}>
                                         <View style={{flex: 1, alignItems: 'center',}}>
                                             <TouchableOpacity block onPress={this.showStartTimePicker}>
@@ -268,30 +317,29 @@ class EditFormScreen extends Component {
                                         </View>
                                     </Row>
                                 </Col>
-                            </Grid>
-                            <DateTimePicker mode="time" is24Hour={false}
+                        </Grid>
+                        <DateTimePicker mode="time" is24Hour={false}
                                 isVisible={this.state.isStartTimePickerVisible}
                                 onConfirm={this.handleStartTimePicked}
-                                onCancel={this.hideStartTimePicker} />
-                            <DateTimePicker mode="time" is24Hour={false}
+                            onCancel={this.hideStartTimePicker} />
+                        <DateTimePicker mode="time" is24Hour={false}
                                 isVisible={this.state.isEndTimePickerVisible}
                                 onConfirm={this.handleEndTimePicked}
-                                onCancel={this.hideEndTimePicker} />
-                            <DateTimePicker mode="date" is24Hour={false}
+                            onCancel={this.hideEndTimePicker} />
+                        <DateTimePicker mode="date" is24Hour={false}
                                 isVisible={this.state.isFromDatePickerVisible}
                                 onConfirm={this.handleFromDatePicked}
-                                onCancel={this.hideFromDatePicker} />
-                            <DateTimePicker mode="date" is24Hour={false}
+                            onCancel={this.hideFromDatePicker} />
+                        <DateTimePicker mode="date" is24Hour={false}
                                 isVisible={this.state.isToDatePickerVisible}
                                 onConfirm={this.handleToDatePicked}
-                                onCancel={this.hideToDatePicker} />
-                        </CardItem>
-                        <Button block onPress={() => this.handleUpdateEvent()} >
-                            <Text>Update</Text>
-                        </Button>
-                    </Card>
-                </Content>
-            </Container>
+                            onCancel={this.hideToDatePicker} />
+                    </CardItem>
+                    <Button block onPress={() => this.handleUpdateEvent()} >
+                        <Text>Update</Text>
+                    </Button>
+                </Card>
+            </View>
         );
     }
 }
