@@ -3,21 +3,61 @@ import { Platform, View, Dimensions, TouchableOpacity, StyleSheet, Alert } from 
 import EventCalendar from 'react-native-events-calendar'
 import { Container, Text, Content, Fab, Card, CardItem, Grid, Col } from 'native-base';
 import Modal from "react-native-modal";
-import { deleteEvent } from "../actions/events";
-import FormScreen from "./Form";
-import EditFormScreen from "./editForm";
+import { deleteEvent } from "../../../actions/events";
+import AddEventScreen from "./AddEvent";
+import EditEventScreen from "./EditEvent";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { connect } from 'react-redux';
 import {ExpandableCalendar, CalendarProvider} from 'react-native-calendars';
 import AsyncStorage from '@react-native-community/async-storage'
 import Toast from 'react-native-simple-toast';
+import firebase from 'react-native-firebase';
 
 let date = new Date(Date.now())
 let { width } = Dimensions.get('window')
 let today = new Date().toISOString().split('T')[0];
+let time = date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()
 
-class DemoScreen extends Component {
+class CalendarScreen extends Component {
     
+    componentDidMount() {
+        // Create notification channel required for Android devices
+        this.createNotificationChannel();
+    
+        // Ask notification permission and add notification listener
+        this.checkPermission();
+    }
+    
+    createNotificationChannel = () => {
+        // Build a android notification channel
+        const channel = new firebase.notifications.Android.Channel(
+          'reminder',
+          'Reminders Channel',
+          firebase.notifications.Android.Importance.High
+        ).setDescription('Used for getting reminder notification');
+        // Create the android notification channel
+        firebase.notifications().android.createChannel(channel);
+    };
+
+    checkPermission = async () => {
+        const enabled = await firebase.messaging().hasPermission();
+        if (enabled) {
+            this.notificationListener = firebase.notifications().onNotification(async notification => {
+                // Display your notification
+                await firebase.notifications().displayNotification(notification);
+            });
+        } else {
+            // user doesn't have permission
+            try {
+                await firebase.messaging().requestPermission();
+            } catch (error) {
+                Alert.alert(
+                    'Unable to access the Notification permission. Please enable the Notification Permission from the settings'
+                );
+            }
+        }
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -28,6 +68,7 @@ class DemoScreen extends Component {
             title: '',
             summary: '',
             date: today,
+            time: time,
             month: '',
             isModalVisible: false,
             editModalVisible: false,
@@ -185,8 +226,8 @@ class DemoScreen extends Component {
                         markedDates={this.getMarkedDates()} // {'2019-06-01': {marked: true}, '2019-06-02': {marked: true}, '2019-06-03': {marked: true}};
                         calendarStyle={styles.calendar}
                         theme={this.getTheme()}
-                        leftArrowImageSource={require('../src/img/previous.png')}
-                        rightArrowImageSource={require('../src/img/next.png')}
+                        leftArrowImageSource={require('../../img/previous.png')}
+                        rightArrowImageSource={require('../../img/next.png')}
                         headerStyle={styles.calendar}
                     />
                 </CalendarProvider>
@@ -220,7 +261,8 @@ class DemoScreen extends Component {
                                         </TouchableOpacity>
                                         <Text style={{color:'grey', top: 3, left: 5, fontWeight: 'bold'}}>Add Event</Text>
                                     </View>
-                                    <FormScreen
+                                    <AddEventScreen
+                                        time={this.state.time}
                                         date={this.state.date}
                                         num={false}
                                         callback={this.getAddModalResponse.bind(this)}
@@ -373,7 +415,7 @@ class DemoScreen extends Component {
                                         </TouchableOpacity>
                                         <Text style={{color:'grey', top: 3.5, left: 5, fontWeight: 'bold'}}>Edit Event Details</Text>
                                     </View>
-                                    <EditFormScreen
+                                    <EditEventScreen
                                         data={this.state.result}
                                         visible={false}
                                         callback={this.getEditModalResponse.bind(this)}
@@ -466,4 +508,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(DemoScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(CalendarScreen);

@@ -9,6 +9,9 @@ const initialState = {
     end: '',
     title: '',
     summary: '',
+    nid: 0,
+    active: '', 
+    notificationTime: '',
     events: [],
 }
 
@@ -24,6 +27,9 @@ const eventReducer = (state=initialState, action) => {
                     end: action.payload.endTime,
                     title: action.payload.title,
                     summary: action.payload.summary,
+                    nid: action.payload.nid,
+                    active: action.payload.active,
+                    notificationTime: action.payload.notificationTime
                 })
             })
         case UPDATE_EVENT:

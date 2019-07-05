@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import { Text, View } from 'react-native'
-import { Container, Spinner } from 'native-base';
 import {connect} from 'react-redux'
-import {addEvent} from '../actions/events'
+import {addEvent} from '../../../actions/events'
 import AsyncStorage from '@react-native-community/async-storage'
 import LottieLoader from 'react-native-lottie-loader';
 
@@ -31,26 +29,23 @@ class LoaderScreen extends Component {
                     if(JSON.parse(value).length != 0){
                         if(this.props.event.length == 0){
                             for(let i=0; i<JSON.parse(value).length; i++){
-                                this.props.add(JSON.parse(value)[i].id, JSON.parse(value)[i].fromDate, JSON.parse(value)[i].toDate, JSON.parse(value)[i].start, JSON.parse(value)[i].end, JSON.parse(value)[i].title, JSON.parse(value)[i].summary);
+                                this.props.add(JSON.parse(value)[i].id, JSON.parse(value)[i].fromDate, JSON.parse(value)[i].toDate, JSON.parse(value)[i].start, JSON.parse(value)[i].end, JSON.parse(value)[i].title, JSON.parse(value)[i].summary, JSON.parse(value)[i].nid, JSON.parse(value)[i].active, JSON.parse(value)[i].notificationTime);
                             }
                         }
-                        this.props.navigation.navigate('Demo')
+                        this.props.navigation.navigate('Calendar')
                     }
                     // else if(JSON.parse(value).length == 0){
-                    //     this.props.navigation.navigate('Demo')
+                    //     this.props.navigation.navigate('Calendar')
                     // }
                 }
                 // else{
-                //     this.props.navigation.navigate('Demo')
+                //     this.props.navigation.navigate('Calendar')
                 // }
-                this.props.navigation.navigate('Demo')
+                this.props.navigation.navigate('Calendar')
             })
         }
         catch{
-            console.log('====================================');
-            console.log('NO DATA AVAILABLE');
-            console.log('====================================');
-            this.props.navigation.navigate('Demo')
+            this.props.navigation.navigate('Calendar')
         }
     }
     
@@ -71,8 +66,8 @@ const mapStateToProps = state => {
   
 const mapDispatchToProps = dispatch => {
     return {
-        add: (id, fromDate, toDate, startTime, endTime, title, summary) => {   
-            dispatch(addEvent(id, fromDate, toDate, startTime, endTime, title, summary))
+        add: (id, fromDate, toDate, startTime, endTime, title, summary, nid, active, notificationTime) => {   
+            dispatch(addEvent(id, fromDate, toDate, startTime, endTime, title, summary, nid, active, notificationTime))
         }
     }
 }

@@ -7,15 +7,15 @@
  */
 
 import React, {Component} from 'react';
-import CalenderScreen from './src/Calender';
-import FormScreen from './src/Form';
-import EditFormScreen from './src/editForm';
+// import CalenderScreen from './src/Calender';
+// import FormScreen from './src/Form';
+// import EditFormScreen from './src/editForm';
 import { createStackNavigator, createAppContainer } from "react-navigation";
-import AgendaScreen from './src/Agenda';
-import DemoScreen from './src/DemoScreen';
-import LoaderScreen from './src/LoaderScreen';
+import CalendarScreen from './src/screen/Calendar';
+import LoaderScreen from './src/screen/Loader';
 
 class App extends Component {
+
   render() {
     return (
       <AppNavigator />
@@ -27,21 +27,18 @@ const AppNavigator = createStackNavigator({
   Loader: {
     screen: LoaderScreen
   },
-  Demo: {
-    screen: DemoScreen
+  Calendar: {
+    screen: CalendarScreen
   },
-  Agenda: {
-    screen: AgendaScreen
-  },
-  Calender: {
-    screen: CalenderScreen
-  },
-  Event:{
-    screen: FormScreen
-  },
-  EditEvent:{
-    screen: EditFormScreen
-  }
+  // Calender: {
+  //   screen: CalenderScreen
+  // },
+  // Event:{
+  //   screen: FormScreen
+  // },
+  // EditEvent:{
+  //   screen: EditFormScreen
+  // }
 },{
     headerMode: 'none',
     navigationOptions: {
