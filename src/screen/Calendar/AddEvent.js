@@ -24,9 +24,9 @@ class AddEventScreen extends Component {
         isErrorTitle: false,
         StartTime: this.props.time,
         EndTime: this.props.time,
-        isErrorEndTime: false,
+        isErrorFromDateTime: false,
+        isErrorToDateTime: false,
         toDate: this.props.date,
-        isErrorToDate: false,
         fromDate: this.props.date,
         summary: '',
         isStartTimePickerVisible: false,
@@ -92,11 +92,23 @@ class AddEventScreen extends Component {
         datetime = year+"-"+month+"-"+day
         let startTime = date.toString()
         startTime = startTime.substr(15,9).trim();
-        this.setState({
-            StartTime: startTime,
-            fromDate: datetime,
-            notificationTime: moment(dy)
-        })
+        let err = date-today;
+        if(err<=0){
+            this.setState({
+                isErrorFromDateTime: true,
+                StartTime: startTime,
+                fromDate: datetime
+            })
+        }
+        else if(err>0){
+            this.setState({
+                isErrorFromDateTime: false,
+                StartTime: startTime,
+                fromDate: datetime,
+                EndTime: startTime,
+                notificationTime: moment(dy)
+            })
+        }
         this.hideStartTimePicker();
     };
     handleEndTimePicked = (date) => {
@@ -108,18 +120,21 @@ class AddEventScreen extends Component {
         datetime = year+"-"+month+"-"+day
         
         let endTime = date.toString()
+        date = Date.parse(date)
+        end = Date(this.state.EndTime)
+        end = Date.parse(end)
+        let err = date - end
         endTime = endTime.substr(15,9).trim();
-        let err = parseInt(endTime) - parseInt(this.state.StartTime)
-        if(err <= 0){
+        if(err<=0){
             this.setState({
-                isErrorEndTime: true,
+                isErrorToDateTime: true,
                 EndTime: endTime,
                 toDate: datetime
             })
         }
-        else if(err> 0){
+        else if(err>0){
             this.setState({
-                isErrorEndTime: false,
+                isErrorToDateTime: false,
                 EndTime: endTime,
                 toDate: datetime
             })
@@ -142,7 +157,7 @@ class AddEventScreen extends Component {
         for(let i=0; i<dateArray.length; i++){
             let startDate = dateArray[i].toString()+ " " +this.state.StartTime;
             let toDate = dateArray[i].toString()+ " " +this.state.EndTime;
-            if(!this.state.isErrorEndTime && !this.state.isErrorToDate){
+            if(!this.state.isErrorFromDateTime && !this.state.isErrorToDateTime){
                 if(this.state.title.length > 0){
                     this.props.add(this.props.event.length, this.state.fromDate, this.state.toDate, startDate, toDate, this.state.title, this.state.summary, this.state.nid, this.state.isSwitchOn, this.state.notificationTime)
                     this.setReminder();
@@ -155,9 +170,9 @@ class AddEventScreen extends Component {
                     this.props.callback(this.props.num);
                 }
             }
-            else if(this.state.isErrorToDate){
+            else if(this.state.isErrorFromDateTime){
             }
-            else if(this.state.isErrorEndTime){
+            else if(this.state.isErrorFromDateTime){
             }
         }
     }
@@ -215,14 +230,17 @@ class AddEventScreen extends Component {
                                 <Row size={50}>
                                     <View style={{flex: 1, alignItems: 'center',}}>
                                         <TouchableOpacity block onPress={this.showStartTimePicker}>
-                                            <Text style={{fontSize: 20, fontWeight: 'bold', color:'#686767'}}>{this.state.fromDate} - {this.state.StartTime}</Text> 
+                                            {this.state.isErrorFromDateTime
+                                            ? <Text style={{fontSize: 18, fontWeight: 'bold', color:'red',fontWeight: 'bold'}}>{this.state.fromDate} - {this.state.StartTime}</Text>
+                                            : <Text style={{fontSize: 20, fontWeight: 'bold', color:'#686767'}}>{this.state.fromDate} - {this.state.StartTime}</Text>
+                                            }
                                         </TouchableOpacity>
                                     </View>
                                 </Row>
                                 <Row size={50}>
                                     <View style={{flex: 1, alignItems: 'center',}}>
                                         <TouchableOpacity block onPress={this.showEndTimePicker}>
-                                            {this.state.isErrorEndTime
+                                            {this.state.isErrorToDateTime
                                             ? <Text style={{fontSize: 18, fontWeight: 'bold', color:'red',fontWeight: 'bold'}}>{this.state.toDate} - {this.state.EndTime}</Text>
                                             : <Text style={{fontSize: 20, fontWeight: 'bold', color:'#686767'}}>{this.state.toDate} - {this.state.EndTime}</Text>
                                             }
