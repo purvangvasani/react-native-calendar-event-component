@@ -21,6 +21,7 @@ let time = date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()
 class CalendarScreen extends Component {
     
     componentDidMount() {
+        
         // Create notification channel required for Android devices
         this.createNotificationChannel();
     
@@ -68,7 +69,7 @@ class CalendarScreen extends Component {
             title: '',
             summary: '',
             date: today,
-            time: time,
+            time: date.toString().substr(16,9).trim(),
             month: '',
             isModalVisible: false,
             editModalVisible: false,
