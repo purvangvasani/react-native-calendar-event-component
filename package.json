@@ -12,7 +12,7 @@
     "moment": "^2.24.0",
     "native-base": "^2.12.1",
     "react": "16.8.3",
-    "react-native": "0.59.9",
+    "react-native": "0.62.3",
     "react-native-calendars": "^1.188.0",
     "react-native-events-calendar": "^1.0.8",
     "react-native-firebase": "^5.5.3",
